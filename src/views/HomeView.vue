@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const msg = ref<String>('Home')
+const msg = ref<string>('Home')
 </script>
 
 <style lang="scss" scoped>

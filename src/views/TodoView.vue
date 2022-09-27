@@ -9,9 +9,6 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const msg = ref<string>('TodoView')
 const todoId = route.params.id
-const say = () => {
-  console.log('Hello')
-}
 </script>
 
 <style scoped>
