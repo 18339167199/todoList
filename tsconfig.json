@@ -8,7 +8,6 @@
       "#/*": ["./src/components/*"]
     }
   },
-
   "references": [
     {
       "path": "./tsconfig.config.json"

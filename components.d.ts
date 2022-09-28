@@ -16,7 +16,7 @@ declare module '@vue/runtime-core' {
     ALayoutContent: typeof import('ant-design-vue/es')['LayoutContent']
     ALayoutSider: typeof import('ant-design-vue/es')['LayoutSider']
     ARow: typeof import('ant-design-vue/es')['Row']
-    Login: typeof import('./src/components/login.vue')['default']
+    ASpin: typeof import('ant-design-vue/es')['Spin']
     LoginComp: typeof import('./src/components/loginComp.vue')['default']
     RegisterComp: typeof import('./src/components/registerComp.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

@@ -1,64 +1,70 @@
 <template>
-  <div class="register">
-    <h1>Todo</h1>
-    <a-form
-      name="registerForm"
-      class="form"
-      layout="vertical"
-      :model="formState"
-      @finish="register"
-      @finishFailed="validateFailed"
-      ref="form"
-    >
-
-      <a-form-item
-        v-for="(formItem, key) in formItems"
-        :key="key"
-        :label="formItem.label"
-        :name="key"
-        :rules="formItem.rules"
-        validateFirst
+  <div class="register" :style="{ opacity: loading ? 0.5 : 1 }">
+    <div class="register-wrapper">
+      <h1>Todo</h1>
+      <a-form
+        name="registerForm"
+        class="form"
+        layout="vertical"
+        :model="formState"
+        @finish="register"
+        @finishFailed="validateFailed"
+        ref="registerForm"
       >
-        <a-input
-          v-if="formItem.type === 'text'"
-          size="large"
-          v-model:value="formState[key]"
-          :placeholder="formItem.placeholder"
-        />
-        <a-input-password
-          v-else-if="formItem.type === 'password'"
-          size="large"
-          v-model:value="formState[key]"
-          :placeholder="formItem.placeholder"
-        />
-      </a-form-item>
+        <a-form-item
+          v-for="(formItem, key) in formItems"
+          :key="key"
+          :label="formItem.label"
+          :name="key"
+          :rules="formItem.rules"
+          validateFirst
+        >
+          <a-input
+            v-if="formItem.type === 'text'"
+            size="large"
+            v-model:value="formState[key]"
+            :placeholder="formItem.placeholder"
+          />
+          <a-input-password
+            v-else-if="formItem.type === 'password'"
+            size="large"
+            v-model:value="formState[key]"
+            :placeholder="formItem.placeholder"
+          />
+        </a-form-item>
 
-      <!-- submit button -->
-      <a-form-item >
-        <a-row style="width: 100%; justify-content: flex-end;">
-          <a-button
-            class="login-btn"
-            html-type="submit"
-            size="default"
-          >
-            登录
-          </a-button>
-        </a-row>
-      </a-form-item>
-
-    </a-form>
-    <div class="to-login">
-      <p class="p" @click="() => { emit('switch') }">
-        <span>已有账号？去登陆！</span>
-        <arrow-right-outlined class="arrow"/>
-      </p>
+        <!-- submit button -->
+        <a-form-item >
+          <a-row style="width: 100%; justify-content: flex-end;">
+            <a-button
+              class="login-btn"
+              html-type="submit"
+              size="default"
+            >
+              注册
+            </a-button>
+          </a-row>
+        </a-form-item>
+      </a-form>
+      <div class="to-login">
+        <p class="p" @click="() => { emit('switch') }">
+          <span>已有账号？去登陆！</span>
+          <arrow-right-outlined class="arrow"/>
+        </p>
+      </div>
+    </div>
+    <div class="loading" v-show="loading">
+      <a-spin wrapperClassName="register-loading"></a-spin>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { useDataStore } from '@/stores/data'
 import { ArrowRightOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import type { FormInstance } from 'ant-design-vue'
 
 type FormState = {
   username: string,
@@ -76,7 +82,9 @@ type FormConfig = {
 }
 
 const emit = defineEmits(['switch'])
-
+const dataStore = useDataStore()
+const loading = ref<boolean>(false)
+const registerForm = ref<FormInstance>()
 const formState = reactive<FormState>({
   username: '',
   password: '',
@@ -84,7 +92,6 @@ const formState = reactive<FormState>({
   email: '',
   nikeName: ''
 })
-
 const validateDpassword = () => {
   return new Promise((resolve, reject) => {
     if (formState.dPassword !== formState.password) {
@@ -93,7 +100,6 @@ const validateDpassword = () => {
     resolve(true)
   })
 }
-
 const formItems = reactive<{[propName in keyof FormState]: FormConfig}>({
   username: {
     type: 'text',
@@ -110,7 +116,6 @@ const formItems = reactive<{[propName in keyof FormState]: FormConfig}>({
     placeholder: '请输入密码',
     rules: [
       { required: true, message: '请输入密码' },
-      { validator: validateDpassword }
     ]
   },
   dPassword: {
@@ -133,28 +138,46 @@ const formItems = reactive<{[propName in keyof FormState]: FormConfig}>({
     placeholder: '请输入昵称'
   }
 })
-
 const register = () => {
-  console.log('register')
+  loading.value = true
+  setTimeout(() => {
+    loading.value = false
+    dataStore.addUser({
+      id: -1,
+      username: formState.username,
+      password: formState.password,
+      email: formState.email,
+      nikeName: formState.nikeName
+    }).then(resp => {
+      emit('switch')
+      registerForm.value?.resetFields()
+      message.success(resp)
+    }, err => {
+      message.error(err.message)
+    })
+  }, 1500)
 }
-
 const validateFailed = () => {
-  console.log('validateFailed!')
+  message.warn('请将必填项填写完整!')
 }
-
 </script>
 
 <style lang="scss" scoped>
 $main-body-bg: #323542;
 
 .register {
+  position: relative;
   width: 80%;
+  max-width: 500px;
   margin: 0 auto;
   border-radius: $border-radius;
   background: $main-body-bg;
-  padding: 2rem;
   box-sizing: border-box;
-  max-width: 500px;
+  transition: opacity 1s cubic-bezier(.075,.82,.165,1);
+
+  &-wrapper {
+    padding: 2rem;
+  }
 
   h1 {
     font-weight: bolder;
@@ -195,5 +218,16 @@ $main-body-bg: #323542;
       font-size: .8rem;
     }
   }
+}
+
+.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

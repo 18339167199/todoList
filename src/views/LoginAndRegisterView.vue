@@ -20,7 +20,7 @@ import { ref } from 'vue'
 import LoginComp from '#/loginComp.vue'
 import RegisterComp from '#/registerComp.vue'
 
-const isRegisterMode = ref<boolean>(true)
+const isRegisterMode = ref<boolean>(false)
 const switchStaus = () => {
   isRegisterMode.value = !(isRegisterMode.value)
 }

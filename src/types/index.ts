@@ -1,8 +1,8 @@
 export type Todo = {
   id: number,
   groupId: number,
-  done: number,
-  star: number,
+  done: 0 | 1,
+  star: 0 | 1,
   content: string,
   note: string,
   createTime: string,
@@ -13,9 +13,7 @@ export type Todo = {
 export type Group = {
   id: number,
   userId: number,
-  folderId: number,
   count: number,
-  icon: string,
   gname: string,
   descr: string,
   createTime: string,
