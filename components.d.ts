@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     ARow: typeof import('ant-design-vue/es')['Row']
     Login: typeof import('./src/components/login.vue')['default']
     LoginComp: typeof import('./src/components/loginComp.vue')['default']
+    RegisterComp: typeof import('./src/components/registerComp.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

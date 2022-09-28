@@ -2,17 +2,19 @@
   <div class="login-box">
     <h1>Todo</h1>
     <a-form
+      name="loginForm"
       class="form"
       :model="formState"
+      :rules="{
+        username: [{ required: true, message: '请输入账户名!' }],
+        password: [{ required: true, message: '请输入密码!' }]
+      }"
       @finish="login"
       @finishFailed="validateFailed"
       ref="form"
     >
       <!-- username -->
-      <a-form-item
-        name="username"
-        :rules="[{ required: true, message: '请输入账户名!' }]"
-      >
+      <a-form-item name="username">
         <a-input
           size="large"
           v-model:value="formState.username"
@@ -21,10 +23,7 @@
       </a-form-item>
 
       <!-- password -->
-      <a-form-item
-        name="password"
-        :rules="[{ required: true, message: '请输入密码!' }]"
-      >
+      <a-form-item name="password">
         <a-input-password
           size="large"
           v-model:value="formState.password"
@@ -43,12 +42,10 @@
             登录
           </a-button>
         </a-row>
-        
       </a-form-item>
-
     </a-form>
     <div class="register">
-      <p class="p">
+      <p class="p" @click="() => { emit('switch') }">
         <span>还没有账号？去注册！</span>
         <arrow-right-outlined class="arrow"/>
       </p>
@@ -64,6 +61,8 @@ type FormState = {
   username: string,
   password: string
 }
+
+const emit = defineEmits(['switch'])
 
 const formState = reactive<FormState>({
   username: '',

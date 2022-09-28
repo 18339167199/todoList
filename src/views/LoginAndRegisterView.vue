@@ -3,7 +3,13 @@
     <a-layout-content class="login-main">
       <login-comp
         v-show="!isRegisterMode"
+        @switch="switchStaus"
         ref="login"
+      />
+      <register-comp
+        v-show="isRegisterMode"
+        @switch="switchStaus"
+        ref="register"
       />
     </a-layout-content>
   </a-layout>
@@ -12,9 +18,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import LoginComp from '#/loginComp.vue'
+import RegisterComp from '#/registerComp.vue'
 
-const isRegisterMode = ref<boolean>(false)
-const switchToRegister = () => {
+const isRegisterMode = ref<boolean>(true)
+const switchStaus = () => {
   isRegisterMode.value = !(isRegisterMode.value)
 }
 </script>
