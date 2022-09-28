@@ -8,7 +8,7 @@ export const useDataStore = defineStore('data', () => {
   const todos = reactive<Todo[]>([])
   const groups = reactive<Group[]>([])
   const users = reactive<User[]>([])
-  const loginUser = reactive<User>({ // 当前登录的用户
+  const loginUser = ref<User>({ // 当前登录的用户
     id: -1,
     username: '',
     password: '',
@@ -52,11 +52,7 @@ export const useDataStore = defineStore('data', () => {
     }
 
     if (dataFromLocalStorage.loginUser) {
-      loginUser.id = dataFromLocalStorage.loginUser.id
-      loginUser.username = dataFromLocalStorage.loginUser.username
-      loginUser.password = dataFromLocalStorage.loginUser.password
-      loginUser.email = dataFromLocalStorage.loginUser.email
-      loginUser.nikeName = dataFromLocalStorage.loginUser.nikeName
+      loginUser.value = dataFromLocalStorage.loginUser
     }
 
     if (dataFromLocalStorage.todoIdCount) {
@@ -85,7 +81,9 @@ export const useDataStore = defineStore('data', () => {
       }
 
       // 登录成功
-      resolve({
+      loginUser.value = user
+
+      setTimeout(resolve, 1000, {
         msg: `欢迎回来！${user.nikeName}`,
         data: user
       })
@@ -95,7 +93,12 @@ export const useDataStore = defineStore('data', () => {
   const addUser = (user: User) => {
     return new Promise<string>((resolve, reject) => {
       if (!user.username || !user.password) {
-        reject(new Error('Usernam or password cannot be empty!'))
+        reject(new Error('用户名或【密码了不能为空！'))
+        return
+      }
+
+      if (users.find(u => u.username === user.username)) {
+        reject(new Error('该用户名已存在，请更换后重试！'))
         return
       }
       
@@ -152,7 +155,7 @@ export const useDataStore = defineStore('data', () => {
       addTodo(todo1)
       addTodo(todo2)
 
-      resolve('Registered successfully!')
+      setTimeout(resolve, 1000, '注册成功，请登录！')
     })
   }
 
@@ -176,6 +179,10 @@ export const useDataStore = defineStore('data', () => {
     return true
   }
 
+  // Getters
+  const hasLogined = computed(() =>
+    loginUser.value.id > 0 && loginUser.value.username && loginUser.value.password)
+
   return {
     todos,
     groups,
@@ -188,6 +195,7 @@ export const useDataStore = defineStore('data', () => {
     restoreFromLocalStroage,
     addUser,
     addGroup,
-    addTodo
+    addTodo,
+    hasLogined
   }
 })

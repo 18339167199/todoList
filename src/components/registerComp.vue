@@ -140,22 +140,21 @@ const formItems = reactive<{[propName in keyof FormState]: FormConfig}>({
 })
 const register = () => {
   loading.value = true
-  setTimeout(() => {
+  dataStore.addUser({
+    id: -1,
+    username: formState.username,
+    password: formState.password,
+    email: formState.email,
+    nikeName: formState.nikeName
+  }).then(resp => {
     loading.value = false
-    dataStore.addUser({
-      id: -1,
-      username: formState.username,
-      password: formState.password,
-      email: formState.email,
-      nikeName: formState.nikeName
-    }).then(resp => {
-      emit('switch')
-      registerForm.value?.resetFields()
-      message.success(resp)
-    }, err => {
-      message.error(err.message)
-    })
-  }, 1500)
+    emit('switch')
+    registerForm.value?.resetFields()
+    message.success(resp)
+  }, err => {
+    loading.value = false
+    message.error(err.message)
+  })
 }
 const validateFailed = () => {
   message.warn('请将必填项填写完整!')

@@ -58,6 +58,8 @@ import { message } from 'ant-design-vue'
 import { reactive } from 'vue'
 import { ArrowRightOutlined } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
+import globalLoading from '@/utils/globalLoading'
+import { useRouter } from 'vue-router'
 
 type FormState = {
   username: string,
@@ -66,15 +68,20 @@ type FormState = {
 
 const emit = defineEmits(['switch'])
 const dataStore = useDataStore()
+const router = useRouter()
 
 const formState = reactive<FormState>({
   username: '',
   password: ''
 })
 const login = () => {
+  globalLoading.show()
   dataStore.login(formState).then(resp => {
+    globalLoading.hide()
     message.success(resp.msg)
+    router.push('/home')
   }, err => {
+    globalLoading.hide()
     message.error(err.message)
   })
 }
