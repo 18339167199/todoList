@@ -72,6 +72,26 @@ export const useDataStore = defineStore('data', () => {
     }
   }
 
+  const login = ({ username, password }: { username: string, password: string }) => {
+    return new Promise<{
+      msg: string,
+      data: User
+    }>((resolve, reject) => {
+      const user = users.find(user => user.username === username && user.password === password)
+
+      if (!user) {
+        reject(new Error('用户名或密码错误，请检查后重试！'))
+        return
+      }
+
+      // 登录成功
+      resolve({
+        msg: `欢迎回来！${user.nikeName}`,
+        data: user
+      })
+    })
+  }
+
   const addUser = (user: User) => {
     return new Promise<string>((resolve, reject) => {
       if (!user.username || !user.password) {
@@ -164,6 +184,7 @@ export const useDataStore = defineStore('data', () => {
     todoIdCount,
     groupIdCount,
     userIdCount,
+    login,
     restoreFromLocalStroage,
     addUser,
     addGroup,

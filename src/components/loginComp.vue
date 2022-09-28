@@ -54,8 +54,10 @@
 </template>
 
 <script lang="ts" setup>
+import { message } from 'ant-design-vue'
 import { reactive } from 'vue'
 import { ArrowRightOutlined } from '@ant-design/icons-vue'
+import { useDataStore } from '@/stores/data'
 
 type FormState = {
   username: string,
@@ -63,16 +65,19 @@ type FormState = {
 }
 
 const emit = defineEmits(['switch'])
+const dataStore = useDataStore()
 
 const formState = reactive<FormState>({
   username: '',
   password: ''
 })
-
 const login = () => {
-  console.log('login')
+  dataStore.login(formState).then(resp => {
+    message.success(resp.msg)
+  }, err => {
+    message.error(err.message)
+  })
 }
-
 const validateFailed = () => {
   console.log('validateFailed!')
 }
