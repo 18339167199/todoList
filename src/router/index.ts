@@ -10,22 +10,17 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: () => import(/* webpackChunkName: "HomeView" */ '../views/HomeView.vue')
+      component: () => import(/* webpackChunkName: "HomeView" */ '@/views/HomeView.vue')
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import(/* webpackChunkName: "LoginView" */ '../views/LoginView.vue')
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: () => import(/* webpackChunkName: "RegisterView" */ '../views/RegisterView.vue')
+      component: () => import(/* webpackChunkName: "LoginView" */ '@/views/LoginAndRegisterView.vue')
     },
     {
       path: '/todo/:id',
       name: 'todo',
-      component: () => import(/* webpackChunkName: "RegisterView" */ '../views/TodoView.vue')
+      component: () => import(/* webpackChunkName: "RegisterView" */ '@/views/TodoView.vue')
     },
     { 
       path: '/:pathMatch(.*)*',
