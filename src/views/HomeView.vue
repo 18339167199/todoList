@@ -5,7 +5,6 @@
       width="350px"
     >
       <avatar-comp :height="data.avatarH"/>
-      
       <div
         class="group-wrapper"
         :style="{ height: `calc(100% - ${data.avatarH})` }"
@@ -58,7 +57,7 @@
           color="#108ee9"
           arrow-point-at-center
         >
-          <a-button class="group-add-btn" @click="openDrawer()">
+          <a-button class="group-add-btn" @click="openDrawer(DRAWER_TYPE.ADD_GROUP)">
             <template #icon><DeleteOutlined /></template>
           </a-button>
         </a-tooltip>
@@ -69,7 +68,21 @@
     <a-layout-content>Content</a-layout-content>
   </a-layout>
 
-
+  <a-drawer
+    v-model:visible="data.drawerVisible"
+    class="group-drawer"
+    :title="{
+      [DRAWER_TYPE.ADD_GROUP]: '新增分组',
+      [DRAWER_TYPE.DELETE_GROUP]: '删除分组',
+      [DRAWER_TYPE.EDIT_GROUP]: '编辑分组'
+    }[data.drawerType]"
+    placement="left"
+    :maskClosable="false"
+    width="30%"
+    @after-visible-change="drawerVisibleChange"
+  >
+    aaa
+  </a-drawer>
 </template>
 
 <script setup lang="ts">
@@ -80,22 +93,21 @@ import { message } from 'ant-design-vue'
 import { SearchOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
 
-type Data = {
-  avatarH: string,
-  searchText: string,
-  selectedGroupId: number,
+// drawer 打开的方式
+enum DRAWER_TYPE {
+  ADD_GROUP,
+  DELETE_GROUP,
+  EDIT_GROUP
 }
 
 const dataStore = useDataStore()
-
-const data = reactive<Data>({
+const data = reactive({
   avatarH: '80px',
   searchText: '',
-  selectedGroupId: -1
+  selectedGroupId: -1,
+  drawerVisible: false,
+  drawerType: DRAWER_TYPE.ADD_GROUP
 })
-
-data.selectedGroupId = dataStore.getGroups[0].id
-
 const onSearch = () => {
   if (!data.searchText) {
     message.warn('请输入搜索内容！')
@@ -104,16 +116,20 @@ const onSearch = () => {
 
   console.log('search: ' + data.searchText)
 }
-
 const selectGroup = (groupId: number) => {
   if (groupId && groupId > 0) {
     data.selectedGroupId = groupId
   }
 }
-
-const openDrawer = () => {
-  console.log('open')
+const openDrawer = (type: DRAWER_TYPE) => {
+  data.drawerVisible = true
+  console.log('open', type)
 }
+const drawerVisibleChange = (visible: boolean) => {
+  console.log('drawerVisible: ' + visible)
+}
+
+data.selectedGroupId = dataStore.getGroups[0].id
 
 watch(() => dataStore.getGroups, (newVal, oldVal) => {
   console.log(newVal, oldVal)
@@ -190,6 +206,12 @@ watch(() => dataStore.getGroups, (newVal, oldVal) => {
       }
 
     }
+  }
+}
+
+.group-drawer {
+  .ant-drawer-content-wrapper {
+    min-width: 250px;
   }
 }
 </style>
