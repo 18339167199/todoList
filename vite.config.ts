@@ -52,5 +52,9 @@ export default defineConfig({
         additionalData: '@import "@/assets/scss/globalVar.scss"; @import "@/assets/scss/globalMixin.scss";'
       }
     }
+  },
+  server: { // 开发代理配置
+    port: 8080,
+    open: true,
   }
 })

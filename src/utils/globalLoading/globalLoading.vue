@@ -1,16 +1,17 @@
 <template>
   <div
-    v-show="props.data.show"
     :class="{
       'loading': true,
-      'close': !props.data.show
+      'open': props.data.show
     }"
   >
-    <spin tip="加载中..."></spin>
+    <spin :indicator="indicator" wrapperClassName="global-loading"></spin>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { LoadingOutlined } from '@ant-design/icons-vue'
+import { h } from 'vue'
 import spin from 'ant-design-vue/lib/spin'
 
 const props = defineProps<{
@@ -19,10 +20,18 @@ const props = defineProps<{
     title: string
   }
 }>()
+
+const indicator = h(LoadingOutlined, {
+  style: {
+    fontSize: '35px',
+    color: 'rgba(0, 0, 0, .5)'
+  },
+  spin: true,
+})
 </script>
 
 <style scoped lang="scss">
-@keyframes disapper {
+@keyframes appear {
   from {
     opacity: 0;
   } to {
@@ -33,20 +42,20 @@ const props = defineProps<{
 .loading {
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, .5);
   position: fixed;
   top: 0;
   left: 0;
-  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  animation: disapper .5s;
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
+  display: none;
 
-  &.close {
-    animation-direction: reverse;
+  &.open {
+    display: flex;
+    animation: appear 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
   }
 
   $iconH: 25px;

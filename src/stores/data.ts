@@ -126,8 +126,28 @@ export const useDataStore = defineStore('data', () => {
         createTime: getCurrentDateStr(),
         updateTime: ''
       }
+      const group3: Group = {
+        id: -1,
+        userId: user.id,
+        count: 0,
+        gname: '今天吃什么',
+        descr: '',
+        createTime: getCurrentDateStr(),
+        updateTime: ''
+      }
+      const group4: Group = {
+        id: -1,
+        userId: user.id,
+        count: 0,
+        gname: '娱乐活动安排',
+        descr: '放松身心，适当运动~',
+        createTime: getCurrentDateStr(),
+        updateTime: ''
+      }
       addGroup(group1)
       addGroup(group2)
+      addGroup(group3)
+      addGroup(group4)
 
       // add default todo
       const todo1: Todo = {

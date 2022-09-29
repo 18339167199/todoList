@@ -1,5 +1,5 @@
 <template>
-  <div class="register" :style="{ opacity: loading ? 0.5 : 1 }">
+  <div class="register">
     <div class="register-wrapper">
       <h1>Todo</h1>
       <a-form
@@ -11,6 +11,7 @@
         @finishFailed="validateFailed"
         ref="registerForm"
       >
+        <!-- input -->
         <a-form-item
           v-for="(formItem, key) in formItems"
           :key="key"
@@ -53,9 +54,6 @@
         </p>
       </div>
     </div>
-    <div class="loading" v-show="loading">
-      <a-spin wrapperClassName="register-loading"></a-spin>
-    </div>
   </div>
 </template>
 
@@ -65,6 +63,7 @@ import { useDataStore } from '@/stores/data'
 import { ArrowRightOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import type { FormInstance } from 'ant-design-vue'
+import globalLoading from '@/utils/globalLoading'
 
 type FormState = {
   username: string,
@@ -83,7 +82,6 @@ type FormConfig = {
 
 const emit = defineEmits(['switch'])
 const dataStore = useDataStore()
-const loading = ref<boolean>(false)
 const registerForm = ref<FormInstance>()
 const formState = reactive<FormState>({
   username: '',
@@ -139,7 +137,7 @@ const formItems = reactive<{[propName in keyof FormState]: FormConfig}>({
   }
 })
 const register = () => {
-  loading.value = true
+  globalLoading.show()
   dataStore.addUser({
     id: -1,
     username: formState.username,
@@ -147,12 +145,12 @@ const register = () => {
     email: formState.email,
     nikeName: formState.nikeName
   }).then(resp => {
-    loading.value = false
+    globalLoading.hide()
     emit('switch')
     registerForm.value?.resetFields()
     message.success(resp)
   }, err => {
-    loading.value = false
+    globalLoading.hide()
     message.error(err.message)
   })
 }
