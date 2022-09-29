@@ -1,13 +1,13 @@
 <template>
   <a-popover
     placement="right"
-    trigger="contextmenu"
     :mouseEnterDelay="0"
     destroyTooltipOnHide
+    :visible="popoverShow"
   >
     <template #content>
       <a-menu>
-        <a-menu-item>编辑分组</a-menu-item>
+        <a-menu-item @click="() => { $emit('openDrawer', DRAWER_TYPE.EDIT_GROUP, props.data) }">编辑分组</a-menu-item>
         <a-menu-item>删除分组</a-menu-item>
       </a-menu>
     </template>
@@ -16,13 +16,14 @@
       <a-tooltip
         :title="props.data.descr"
         :disabled="props.data.descr"
-        placement="bottom"
+        placement="top"
         trigger="hover"
         color="#108ee9"
       >
         <a-row
           title="鼠标右键点击查看更多操作"
           @click.left="() => { $emit('select', props.data.id) }"
+          @contextmenu="() => { popoverShow = true }"
           :class="{
             'groups-item': true,
             'active': selected
@@ -38,12 +39,16 @@
 </template>
 
 <script setup lang="ts">
+  import { ref } from 'vue'
 import type { Group } from '@/types'
+import { DRAWER_TYPE } from '@/utils/util'
 
 const props = defineProps<{
   data: Group,
   selected: boolean
 }>()
+
+const popoverShow = ref<boolean>(false)
 
 </script>
 

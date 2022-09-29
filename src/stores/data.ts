@@ -189,13 +189,25 @@ export const useDataStore = defineStore('data', () => {
     })
   }
 
-  const addGroup = (group: Group): boolean => {
+  const addGroup = (group: Group) => {
     group.id = ++groupIdCount.value
     if (group.userId > 0) {
       groups.push(group)
       return true
     }
     return false
+  }
+  const updateGroup= ({ id, gname, descr }: { id: number, gname: string, descr: string }) => {
+    const group = groups.find(g => g.id === id)
+
+    if (!group) {
+      return false
+    }
+
+    group.gname = gname
+    group.descr = descr
+    group.updateTime = getCurrentDateStr()
+    return true
   }
 
   const addTodo = (todo: Todo): boolean => {
