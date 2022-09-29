@@ -90,6 +90,16 @@ export const useDataStore = defineStore('data', () => {
     })
   }
 
+  const loginOut = () => {
+    loginUser.value = {
+      id: -1,
+      username: '',
+      password: '',
+      nikeName: '',
+      email: ''
+    }
+  }
+
   const addUser = (user: User) => {
     return new Promise<string>((resolve, reject) => {
       if (!user.username || !user.password) {
@@ -201,7 +211,11 @@ export const useDataStore = defineStore('data', () => {
 
   // Getters
   const hasLogined = computed(() =>
-    loginUser.value.id > 0 && loginUser.value.username && loginUser.value.password)
+    loginUser.value.id > 0 && !!loginUser.value.username && !!loginUser.value.password)
+
+  const getUserInfo = computed(() => loginUser.value)
+
+  const getGroups = computed(() => groups.filter(group => group.userId === loginUser.value.id))
 
   return {
     todos,
@@ -212,10 +226,13 @@ export const useDataStore = defineStore('data', () => {
     groupIdCount,
     userIdCount,
     login,
+    loginOut,
     restoreFromLocalStroage,
     addUser,
     addGroup,
     addTodo,
-    hasLogined
+    hasLogined,
+    getUserInfo,
+    getGroups
   }
 })
