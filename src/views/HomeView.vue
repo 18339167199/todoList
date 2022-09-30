@@ -65,8 +65,47 @@
       </a-row>
       </div>
     </a-layout-sider>
+    <a-layout-content class="main" :data-color-mode="data.themeNumber">
+      <a-layout-header class="main-header">
+        <a-row>
+          <a-col :span="12" style="text-align: left"><h1>我的一天</h1></a-col>
+          <a-col
+            :span="12" style="display: flex;
+            justify-content: flex-end; align-items: center;"
+          >
+            <a-popover
+              trigger="click"
+              width="360px"
+              title="主题"
+              placement="bottomLeft"
+              :overlayStyle="{ 'min-width': '360px' }"
+            >
+              <template #content>
+                <a-row class="theme-wrapper">
+                  <a-col
+                    :span="6"
+                    v-for="themeNumber in 14"
+                    :key="themeNumber"
+                  >
+                    <div
+                      class="color-block"
+                      :theme-mode="themeNumber"
+                      @click="selectTheme(themeNumber)">
+                    </div>
+                  </a-col>
+                </a-row>
+              </template>
 
-    <a-layout-content>Content</a-layout-content>
+              <div class="theme-picker" title="切换主题色">
+                <BgColorsOutlined />
+              </div>
+            </a-popover>
+
+          </a-col>
+        </a-row>
+      </a-layout-header>
+      <todo-list-comp/>
+    </a-layout-content>
   </a-layout>
 
   <!-- group drawer -->
@@ -166,12 +205,14 @@
 import { reactive, ref, watch } from 'vue'
 import AvatarComp from '#/avatarComp.vue'
 import GroupComp from '#/groupComp.vue'
+import TodoListComp from '#/todoListComp.vue'
 import { message, type FormInstance } from 'ant-design-vue'
-import { SearchOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { SearchOutlined, DeleteOutlined, PlusOutlined, BgColorsOutlined } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
 import { getCurrentDateStr } from '@/utils/util'
 import type { Group } from '@/types'
 import { DRAWER_TYPE } from '@/utils/util'
+import LocalStorage from '@/utils/localStroage'
 
 const dataStore = useDataStore()
 const data = reactive({
@@ -191,7 +232,8 @@ const data = reactive({
       { required: true, message: '请输入分组名称' },
     ]
   },
-  deleteGroupIds: []
+  deleteGroupIds: [],
+  themeNumber: LocalStorage.get<number>('themeNumber') || 1,
 })
 const createGroupFormRef = ref<FormInstance>()
 const onSearch = () => {
@@ -259,6 +301,10 @@ const deleteGroups = () => {
     message.error('删除失败！')
   }
 }
+const selectTheme = (themeNumber: number) => {
+  data.themeNumber = themeNumber
+  LocalStorage.set('themeNumber', themeNumber)
+}
 
 data.selectedGroupId = dataStore.getGroups[0].id
 watch(() => dataStore.getGroups, (newVal, oldVal) => {
@@ -271,6 +317,26 @@ watch(() => dataStore.getGroups, (newVal, oldVal) => {
 </script>
 
 <style lang="scss" scoped>
+$background-color-list: // data-color-mode = ?
+  #788CDE, // 1
+  #A05FA1, // 2
+  #C44F6F, // 3
+  #C5524D, // 4
+  #2D8660, // 5
+  #28837E, // 6
+  #6A7883, // 7
+  #DFEDF9, // 8
+  #F2E7F9, // 9
+  #FFE4E9, // 10
+  #F9E8DE, // 11
+  #D5F1E5, // 12
+  #D4F1EF, // 13
+  #E7ECF0; // 14
+$text-color-list: 
+  #fff, #fff, #fff, #fff, #fff, #fff, #fff,
+  $text-color, $text-color, $text-color, $text-color, $text-color, $text-color, $text-color;
+
+
 .home {
   height: 100%;
 
@@ -337,6 +403,51 @@ watch(() => dataStore.getGroups, (newVal, oldVal) => {
 
     }
   }
+
+  .main {
+    padding: 2%;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    @include transition('background-color', $default-transition-duration);
+
+    @each $color in $background-color-list {
+      $index: index($background-color-list, $color);
+      &[data-color-mode="#{$index}"] {
+        --background-color: #{$color};
+        --text-color: #{nth($text-color-list, $index)};
+      }
+    }
+
+    $headerH: 60px;
+    .main-header {
+      background-color: transparent;
+      padding: 0;
+      color: inherit;
+      font-size: 2rem;
+      height: $headerH;
+      h1 {
+        color: inherit;
+        font-size: inherit;
+        font-weight: bold;
+        letter-spacing: .2rem;
+        margin: 0;
+        line-height: $headerH;
+      }
+      .theme-picker {
+        height: 45px;
+        width: 45px;
+        border-radius: $border-radius;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        @include transition('background-color', $default-transition-duration);
+        &:hover {
+          background-color: rgba(255, 255, 255, .5);
+        }
+      }
+    }
+  }
 }
 
 .group-drawer {
@@ -358,6 +469,24 @@ watch(() => dataStore.getGroups, (newVal, oldVal) => {
         font-size: 12px;
         margin-left: 3px;
         transform: scale(.75);
+      }
+    }
+  }
+}
+
+.theme-wrapper {
+  .ant-col{
+    .color-block {
+      padding: calc(50% - 2px);
+      margin: 2px;
+      background-position: center;
+      background-size: cover;
+      cursor: pointer;
+    }
+    @for $i from 1 through 14 {
+      &:nth-child(#{$i}) .color-block {
+        background: #{nth($background-color-list, $i)};
+        color: #{nth($text-color-list, $i)};
       }
     }
   }

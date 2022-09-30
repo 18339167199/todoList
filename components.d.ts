@@ -19,6 +19,7 @@ declare module '@vue/runtime-core' {
     AInputSearch: typeof import('ant-design-vue/es')['InputSearch']
     ALayout: typeof import('ant-design-vue/es')['Layout']
     ALayoutContent: typeof import('ant-design-vue/es')['LayoutContent']
+    ALayoutHeader: typeof import('ant-design-vue/es')['LayoutHeader']
     ALayoutSider: typeof import('ant-design-vue/es')['LayoutSider']
     AMenu: typeof import('ant-design-vue/es')['Menu']
     AMenuItem: typeof import('ant-design-vue/es')['MenuItem']
@@ -31,5 +32,7 @@ declare module '@vue/runtime-core' {
     RegisterComp: typeof import('./src/components/registerComp.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TodolistComp: typeof import('./src/components/todolistComp.vue')['default']
+    TodoListComp: typeof import('./src/components/todoListComp.vue')['default']
   }
 }
