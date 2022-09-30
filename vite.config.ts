@@ -6,6 +6,9 @@ import path from 'path'
 import Components from 'unplugin-vue-components/vite'
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 
+// gzip 打包
+import viteCompression from 'vite-plugin-compression'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
@@ -36,6 +39,14 @@ export default defineConfig({
     // antd 按需加载插件配置
     Components({
       resolvers: [AntDesignVueResolver()]
+    }),
+    //gzip压缩
+    viteCompression({
+      verbose: true,
+      disable: false,
+      threshold: 10240,
+      algorithm: 'gzip',
+      ext: '.gz',
     })
   ],
   resolve: {

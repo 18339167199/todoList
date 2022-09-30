@@ -21,9 +21,14 @@
       v-show="doneTodo.length > 0"
     >
       <div class="fold-button-wrapper">
-        <a-button>
+        <a-button @click="() => { doneTodoShow = !doneTodoShow }">
           <template #icon>
-            <DownOutlined />
+            <DownOutlined
+              :class="{
+                'fold-button': true,
+                rotate: !doneTodoShow
+              }"
+            />
           </template>
           已完成 {{ doneTodo.length }}
         </a-button>
@@ -44,15 +49,25 @@ import { computed, ref } from 'vue'
 import TodoItemComp from '#/todoItemComp.vue'
 import { useDataStore } from '@/stores/data'
 import { DownOutlined } from '@ant-design/icons-vue'
+import type { Todo } from '@/types';
 
 const props = defineProps<{
   groupId: number
 }>()
 
 const doneTodoShow = ref<boolean>(true)
+
 const dataStore = useDataStore()
-const doneTodo = computed(() => dataStore.getTodosByGroupId(props.groupId).filter(todo => !!todo.done))
-const undoneTodo = computed(() => dataStore.getTodosByGroupId(props.groupId).filter(todo => !todo.done))
+
+const doneTodo = computed(() => dataStore
+  .getTodosByGroupId(props.groupId)
+  .filter(todo => !!todo.done)
+  .sort((a: Todo, b: Todo) => b.star - a.star))
+
+const undoneTodo = computed(() => dataStore
+  .getTodosByGroupId(props.groupId)
+  .filter(todo => !todo.done)
+  .sort((a: Todo, b: Todo) => b.star - a.star))
 </script>
 
 <style lang="scss" scoped>
@@ -62,7 +77,7 @@ const undoneTodo = computed(() => dataStore.getTodosByGroupId(props.groupId).fil
   flex-direction: column;
 
   .undone-todo {
-    margin-top: 20px;
+    margin-top: 10px;
     text-align: left;
     .fold-button-wrapper {
       margin-bottom: 4px;
@@ -70,6 +85,13 @@ const undoneTodo = computed(() => dataStore.getTodosByGroupId(props.groupId).fil
         border-radius: $border-radius;
         height: 40px;
         background: rgba(255,255,255,.6);
+      }
+      .fold-button {
+        transition: all $default-transition-duration;
+        transform: translateY(1px);
+        &.rotate {
+          transform: rotate(180deg) translateY(2px);
+        }
       }
     }
   }

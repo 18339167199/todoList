@@ -3,18 +3,26 @@
     title="点击查看更多信息"
     :class="{
       'todo-item': true,
-      'active': data.done
+      'active': props.data.done
     }"
   >
-    <div title="标记为完成" class="check" @click.stop="onDone">
+    <div
+      :title="props.data.done ? '标记为未完成' : '标记为完成'"
+      class="check"
+      @click.stop="updateTodoStatus('done', !!props.data.done ? 0 : 1)"
+    >
       <span class="circle">
         <CheckOutlined />
       </span>
     </div>
-    <div class="content">{{ data.content }}</div>
-    <div class="star" title="标记为重要" @click.stop="onStar">
-      <StarFilled v-show="data.star"/>
-      <StarOutlined v-show="!data.star"/>
+    <div class="content">{{ props.data.content }}</div>
+    <div
+      class="star"
+      title="标记为重要"
+      @click.stop="updateTodoStatus('star', !!props.data.star ? 0 : 1)"
+    >
+      <StarFilled v-show="props.data.star"/>
+      <StarOutlined v-show="!props.data.star"/>
     </div>
   </a-row>
 </template>
@@ -22,17 +30,20 @@
 <script lang="ts" setup>
 import type { Todo } from '@/types'
 import { CheckOutlined, StarFilled, StarOutlined } from '@ant-design/icons-vue'
+import { useDataStore } from '@/stores/data'
 
 const props = defineProps<{
   data: Todo
 }>()
 
-const onStar = () => {
-  console.log('star')
-}
+const dataStore = useDataStore()
 
-const onDone = () => {
-  console.log('onDone')
+const updateTodoStatus = (type: 'done' | 'star', value: 0 | 1) => {
+  dataStore.updateTodoStatus({
+    id: props.data.id,
+    type,
+    value
+  })
 }
 </script>
 
@@ -128,12 +139,8 @@ $height: 40px;
     justify-content: center;
     align-items: center;
     color: $text-color;
-    ::v-deep(.anticon) {
-      cursor: pointer;
-    }
-    .star-filled {
-      font-size: 19px;
-    }
+    font-size: 20px;
+    cursor: pointer;
   }
 }
 </style>

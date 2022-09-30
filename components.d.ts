@@ -16,13 +16,11 @@ declare module '@vue/runtime-core' {
     AForm: typeof import('ant-design-vue/es')['Form']
     AFormItem: typeof import('ant-design-vue/es')['FormItem']
     AInput: typeof import('ant-design-vue/es')['Input']
+    AInputPassword: typeof import('ant-design-vue/es')['InputPassword']
     AInputSearch: typeof import('ant-design-vue/es')['InputSearch']
     ALayout: typeof import('ant-design-vue/es')['Layout']
     ALayoutContent: typeof import('ant-design-vue/es')['LayoutContent']
-    ALayoutHeader: typeof import('ant-design-vue/es')['LayoutHeader']
     ALayoutSider: typeof import('ant-design-vue/es')['LayoutSider']
-    AMenu: typeof import('ant-design-vue/es')['Menu']
-    AMenuItem: typeof import('ant-design-vue/es')['MenuItem']
     APopover: typeof import('ant-design-vue/es')['Popover']
     ARow: typeof import('ant-design-vue/es')['Row']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
@@ -33,7 +31,6 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TodoItemComp: typeof import('./src/components/todoItemComp.vue')['default']
-    TodolistComp: typeof import('./src/components/todolistComp.vue')['default']
     TodoListComp: typeof import('./src/components/todoListComp.vue')['default']
   }
 }

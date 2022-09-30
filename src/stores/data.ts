@@ -245,6 +245,14 @@ export const useDataStore = defineStore('data', () => {
     group.count ++
     return true
   }
+  const updateTodoStatus = ({ id, type, value }: { id: number, type: 'done' | 'star', value: 0 | 1 }) => {
+    const todo = todos.find(todo => todo.id === id)
+    if (!todo) {
+      return false
+    }
+    todo[type] = value
+    return true
+  }
 
   /**
    * Getters
@@ -287,6 +295,7 @@ export const useDataStore = defineStore('data', () => {
     deleteGroup,
     deleteGroupByIds,
     addTodo,
+    updateTodoStatus,
     hasLogined,
     getUserInfo,
     getGroups,

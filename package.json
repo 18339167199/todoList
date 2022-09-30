@@ -35,6 +35,7 @@
     "typescript": "~4.7.4",
     "unplugin-vue-components": "^0.22.7",
     "vite": "^3.0.9",
+    "vite-plugin-compression": "^0.5.1",
     "vue-tsc": "^0.40.7"
   }
 }
