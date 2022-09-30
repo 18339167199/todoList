@@ -1,5 +1,5 @@
 import { ref, computed, reactive } from 'vue'
-import { defineStore } from 'pinia'
+import { defineStore, type StoreState } from 'pinia'
 import type { Todo, Group, User } from '@/types'
 import LocalStorage from '@/utils/localStroage'
 import { getCurrentDateStr } from '@/utils/util'
@@ -20,7 +20,10 @@ export const useDataStore = defineStore('data', () => {
   const groupIdCount = ref<number>(0)
   const userIdCount = ref<number>(0)
 
-  // Actions
+  /**
+   * Actions
+   */
+
   const restoreFromLocalStroage = () => {
     const dataFromLocalStorage = LocalStorage.get<{
       todos: Todo[],
@@ -243,13 +246,29 @@ export const useDataStore = defineStore('data', () => {
     return true
   }
 
-  // Getters
+  /**
+   * Getters
+   */
+
   const hasLogined = computed(() =>
     loginUser.value.id > 0 && !!loginUser.value.username && !!loginUser.value.password)
 
   const getUserInfo = computed(() => loginUser.value)
 
+  // group
   const getGroups = computed(() => groups.filter(group => group.userId === loginUser.value.id))
+  const getGroupNameById = computed(() => (id: number) => {
+    const group = groups.find(group => group.id === id)
+    if (!group) {
+      return ''
+    }
+    return group.gname
+  })
+
+  // todo
+  const getTodosByGroupId = computed(() => {
+    return (groupId: number) => todos.filter(todo => todo.groupId === groupId)
+  })
 
   return {
     todos,
@@ -270,6 +289,8 @@ export const useDataStore = defineStore('data', () => {
     addTodo,
     hasLogined,
     getUserInfo,
-    getGroups
+    getGroups,
+    getGroupNameById,
+    getTodosByGroupId
   }
 })

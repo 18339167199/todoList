@@ -32,6 +32,7 @@ declare module '@vue/runtime-core' {
     RegisterComp: typeof import('./src/components/registerComp.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TodoItemComp: typeof import('./src/components/todoItemComp.vue')['default']
     TodolistComp: typeof import('./src/components/todolistComp.vue')['default']
     TodoListComp: typeof import('./src/components/todoListComp.vue')['default']
   }

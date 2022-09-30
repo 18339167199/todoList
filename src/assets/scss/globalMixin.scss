@@ -41,7 +41,7 @@
       @include transition('opacity', $default-transition-duration);
     }
 
-    ::v-deep(.a-icon) {
+    ::v-deep(.anticon) {
       margin-right: 5px;
       margin-top: 1px;
     }

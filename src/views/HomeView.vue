@@ -66,45 +66,46 @@
       </div>
     </a-layout-sider>
     <a-layout-content class="main" :data-color-mode="data.themeNumber">
-      <a-layout-header class="main-header">
-        <a-row>
-          <a-col :span="12" style="text-align: left"><h1>我的一天</h1></a-col>
-          <a-col
-            :span="12" style="display: flex;
-            justify-content: flex-end; align-items: center;"
+      <a-row class="main-header">
+        <a-col :span="12" style="text-align: left">
+          <h1>{{ dataStore.getGroupNameById(data.selectedGroupId) }}</h1>
+        </a-col>
+        <a-col
+          :span="12" style="display: flex;
+          justify-content: flex-end; align-items: center;"
+        >
+          <a-popover
+            trigger="click"
+            width="360px"
+            title="主题"
+            placement="bottomLeft"
+            :overlayStyle="{ 'min-width': '360px' }"
           >
-            <a-popover
-              trigger="click"
-              width="360px"
-              title="主题"
-              placement="bottomLeft"
-              :overlayStyle="{ 'min-width': '360px' }"
-            >
-              <template #content>
-                <a-row class="theme-wrapper">
-                  <a-col
-                    :span="6"
-                    v-for="themeNumber in 14"
-                    :key="themeNumber"
-                  >
-                    <div
-                      class="color-block"
-                      :theme-mode="themeNumber"
-                      @click="selectTheme(themeNumber)">
-                    </div>
-                  </a-col>
-                </a-row>
-              </template>
+            <template #content>
+              <a-row class="theme-wrapper">
+                <a-col
+                  :span="6"
+                  v-for="themeNumber in 14"
+                  :key="themeNumber"
+                >
+                  <div
+                    class="color-block"
+                    :theme-mode="themeNumber"
+                    @click="selectTheme(themeNumber)">
+                  </div>
+                </a-col>
+              </a-row>
+            </template>
 
-              <div class="theme-picker" title="切换主题色">
-                <BgColorsOutlined />
-              </div>
-            </a-popover>
-
-          </a-col>
-        </a-row>
-      </a-layout-header>
-      <todo-list-comp/>
+            <div class="theme-picker" title="切换主题色">
+              <BgColorsOutlined />
+            </div>
+          </a-popover>
+        </a-col>
+      </a-row>
+      <a-row class="main-content">
+        <todo-list-comp :groupId="data.selectedGroupId"/>
+      </a-row>
     </a-layout-content>
   </a-layout>
 
@@ -339,6 +340,7 @@ $text-color-list:
 
 .home {
   height: 100%;
+  display: flex;
 
   .sidebar {
     padding: 10px 20px 0;
@@ -405,7 +407,9 @@ $text-color-list:
   }
 
   .main {
-    padding: 2%;
+    display: flex;
+    flex-direction: column;
+    padding: 1% 2% 2% 2%;
     background-color: var(--background-color);
     color: var(--text-color);
     @include transition('background-color', $default-transition-duration);
@@ -420,6 +424,7 @@ $text-color-list:
 
     $headerH: 60px;
     .main-header {
+      flex: 0;
       background-color: transparent;
       padding: 0;
       color: inherit;
@@ -446,6 +451,11 @@ $text-color-list:
           background-color: rgba(255, 255, 255, .5);
         }
       }
+    }
+
+    .main-content {
+      flex: 1;
+      padding-bottom: 4.5rem;
     }
   }
 }
