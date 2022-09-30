@@ -100,6 +100,7 @@ export const useDataStore = defineStore('data', () => {
     }
   }
 
+  // user
   const addUser = (user: User) => {
     return new Promise<string>((resolve, reject) => {
       if (!user.username || !user.password) {
@@ -189,6 +190,7 @@ export const useDataStore = defineStore('data', () => {
     })
   }
 
+  // group
   const addGroup = (group: Group) => {
     group.id = ++groupIdCount.value
     if (group.userId > 0) {
@@ -199,17 +201,37 @@ export const useDataStore = defineStore('data', () => {
   }
   const updateGroup= ({ id, gname, descr }: { id: number, gname: string, descr: string }) => {
     const group = groups.find(g => g.id === id)
-
     if (!group) {
       return false
     }
-
     group.gname = gname
     group.descr = descr
     group.updateTime = getCurrentDateStr()
     return true
   }
+  const deleteGroup = (id: number) => {
+    const group = groups.find(g => g.id === id)
+    if (!group) {
+      return false
+    }
+    // 将分组下的 todo 删除
+    const needDeleteTodos = todos.filter(todo => todo.groupId === id)
+    for (let i = 0; i < needDeleteTodos.length; i++) {
+      todos.splice(todos.indexOf(needDeleteTodos[i]), 1)
+    }
+    groups.splice(groups.indexOf(group), 1)
+    return true
+  }
+  const deleteGroupByIds = (ids: number[]) => {
+    const isIdsAllExist = ids.every(id => !!groups.find(group => group.id === id))
+    if (!isIdsAllExist) {
+      return false
+    }
+    ids.forEach(id => { deleteGroup(id) })
+    return true
+  }
 
+  // todo
   const addTodo = (todo: Todo): boolean => {
     const group = groups.find(group => group.id === todo.groupId)
     if (!group) {
@@ -242,6 +264,9 @@ export const useDataStore = defineStore('data', () => {
     restoreFromLocalStroage,
     addUser,
     addGroup,
+    updateGroup,
+    deleteGroup,
+    deleteGroupByIds,
     addTodo,
     hasLogined,
     getUserInfo,

@@ -1,29 +1,31 @@
 <template>
   <a-popover
-    placement="right"
+    placement="bottom"
     :mouseEnterDelay="0"
+    trigger="contextmenu"
     destroyTooltipOnHide
-    :visible="popoverShow"
+    v-model:visible="popoverShow"
   >
     <template #content>
-      <a-menu>
-        <a-menu-item @click="() => { $emit('openDrawer', DRAWER_TYPE.EDIT_GROUP, props.data) }">编辑分组</a-menu-item>
-        <a-menu-item>删除分组</a-menu-item>
-      </a-menu>
+      <ul class="popover-ul has-hover-style">
+        <li @click="onEdit">编辑分组</li>
+        <li @click="onDelete">删除分组</li>
+      </ul>
     </template>
 
     <div class="popover-reference-wrapper">
       <a-tooltip
         :title="props.data.descr"
         :disabled="props.data.descr"
-        placement="top"
+        placement="right"
         trigger="hover"
         color="#108ee9"
+        destroyTooltipOnHide
       >
         <a-row
           title="鼠标右键点击查看更多操作"
           @click.left="() => { $emit('select', props.data.id) }"
-          @contextmenu="() => { popoverShow = true }"
+          @contextmenu.prevent="() => { popoverShow = true }"
           :class="{
             'groups-item': true,
             'active': selected
@@ -39,17 +41,47 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+import { ref, createVNode } from 'vue'
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { message, Modal } from 'ant-design-vue'
 import type { Group } from '@/types'
 import { DRAWER_TYPE } from '@/utils/util'
+import { useDataStore } from '@/stores/data'
 
 const props = defineProps<{
   data: Group,
   selected: boolean
 }>()
+const emit = defineEmits(['openDrawer', 'select'])
+const dataStore = useDataStore()
 
 const popoverShow = ref<boolean>(false)
 
+const onEdit = () => {
+  popoverShow.value = false
+  emit('openDrawer', DRAWER_TYPE.UPDATE_GROUP, props.data)
+}
+
+const onDelete = () => {
+  popoverShow.value = false
+  Modal.confirm({
+    centered: true,
+    content: `分组中的待办将一起删除，确定要删除分组“${props.data.gname}”吗？`,
+    icon: createVNode(ExclamationCircleOutlined),
+    cancelText: '取消',
+    onOk() {
+      const result = dataStore.deleteGroup(props.data.id)
+      if (result) {
+        message.success('删除成功！')
+      } else {
+        message.error('删除失败！')
+      }
+    },
+    onCancel() {
+      console.log('cancel')
+    }
+  })
+}
 </script>
 
 <style scoped lang="scss">
@@ -113,5 +145,9 @@ $itemH: 41px;
     top: 50%;
     margin-top: -10px;
   }
+}
+
+.popover-ul {
+  @include ul-style()
 }
 </style>

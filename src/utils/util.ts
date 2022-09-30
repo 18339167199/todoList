@@ -7,5 +7,5 @@ export const getCurrentDateStr = (): string => {
 export enum DRAWER_TYPE {
   ADD_GROUP,
   DELETE_GROUP,
-  EDIT_GROUP
+  UPDATE_GROUP
 }

@@ -76,15 +76,16 @@
     :title="{
       [DRAWER_TYPE.ADD_GROUP]: '新增分组',
       [DRAWER_TYPE.DELETE_GROUP]: '删除分组',
-      [DRAWER_TYPE.EDIT_GROUP]: '编辑分组'
+      [DRAWER_TYPE.UPDATE_GROUP]: '编辑分组'
     }[data.drawerType]"
     placement="left"
     width="30%"
     @after-visible-change="drawerVisibleChange"
   >
+    <!-- group 新增修改 -->
     <a-row
       class="drawer-content"
-      v-show="data.drawerType === DRAWER_TYPE.ADD_GROUP || data.drawerType === DRAWER_TYPE.EDIT_GROUP"
+      v-show="data.drawerType === DRAWER_TYPE.ADD_GROUP || data.drawerType === DRAWER_TYPE.UPDATE_GROUP"
     >
       <a-col :span="24">
         <a-form
@@ -118,6 +119,46 @@
         </a-form>
       </a-col>
     </a-row>
+
+    <!-- 删除 group 多选框 -->
+    <a-row
+      class="drawer-content"
+      v-show="data.drawerType === DRAWER_TYPE.DELETE_GROUP"
+    >
+      <a-col :span="24">
+        <span style="display: block; margin-bottom: 20px; font-size: .8rem;">请选择需要删除的分组:</span>
+        <a-checkbox-group
+          v-model:value="data.deleteGroupIds"
+          style="width: 100%"
+        >
+          <a-checkbox
+            v-for="group in dataStore.getGroups"
+            :key="group.id"
+            style="margin-left: 0; margin: 0 20px 20px 0;"
+            :value="group.id"
+          >
+            <span
+              :data-count="group.count"
+              :class="{
+                'delete-checkbox-content': true,
+                'hide-badge': !group.count
+              }"
+            >
+              {{ group.gname }}</span>
+            <div></div>
+          </a-checkbox>
+        </a-checkbox-group>
+      </a-col>
+      <a-col
+        :span="24"
+        style="text-align: right; margin-top: 20px;"
+      >
+        <a-button
+          type="primary"
+          @click="deleteGroups"
+        >确定</a-button>
+      </a-col>
+    </a-row>
   </a-drawer>
 </template>
 
@@ -141,6 +182,7 @@ const data = reactive({
   drawerType: DRAWER_TYPE.ADD_GROUP,
   drawerBtnLoading: false,
   createGroupForm: {
+    id: -1,
     gname: '',
     descr: '',
   },
@@ -148,7 +190,8 @@ const data = reactive({
     gname: [
       { required: true, message: '请输入分组名称' },
     ]
-  }
+  },
+  deleteGroupIds: []
 })
 const createGroupFormRef = ref<FormInstance>()
 const onSearch = () => {
@@ -156,8 +199,6 @@ const onSearch = () => {
     message.warn('请输入搜索内容！')
     return
   }
-
-  console.log('search: ' + data.searchText)
 }
 const selectGroup = (groupId: number) => {
   if (groupId && groupId > 0) {
@@ -166,17 +207,25 @@ const selectGroup = (groupId: number) => {
 }
 const openDrawer = (type: DRAWER_TYPE, group?: Group) => {
   data.drawerType = type
+  if (data.drawerType === DRAWER_TYPE.UPDATE_GROUP && group) {
+    data.createGroupForm.id = group.id
+    data.createGroupForm.gname = group.gname
+    data.createGroupForm.descr = group.descr
+  }
   data.drawerVisible = true
-  console.log('open', type)
 }
 const drawerVisibleChange = (visible: boolean) => {
-  console.log('drawerVisible: ' + visible)
+  if (!visible) {
+    data.createGroupForm.id = -1
+    data.createGroupForm.gname = ''
+    data.createGroupForm.descr = ''
+  }
 }
 const createGroup = () => {
+  let result = false
   data.drawerBtnLoading = true
-
   if (data.drawerType === DRAWER_TYPE.ADD_GROUP) {
-    dataStore.addGroup({
+    result = dataStore.addGroup({
       id: -1,
       userId: dataStore.getUserInfo.id,
       count: 0,
@@ -185,21 +234,31 @@ const createGroup = () => {
       createTime: getCurrentDateStr(),
       updateTime: ''
     })
-  } else if (data.drawerType === DRAWER_TYPE.EDIT_GROUP) {
-    // dataStore.updateGroup({
-    //   id: 
-    // })
+  } else if (data.drawerType === DRAWER_TYPE.UPDATE_GROUP) {
+    result = dataStore.updateGroup(data.createGroupForm)
+  }
+
+  if (!result) {
+    message.error(data.drawerType === DRAWER_TYPE.ADD_GROUP ? '创建失败！' : '修改失败！')
+    return
   }
 
   setTimeout(() => {
     data.drawerBtnLoading = false
     data.drawerVisible = false
     createGroupFormRef.value?.resetFields()
-    message.success('创建成功！')
+    message.success(data.drawerType === DRAWER_TYPE.ADD_GROUP ? '创建成功！' : '修改成功！')
   }, 1000)
 }
-
-
+const deleteGroups = () => {
+  const result = dataStore.deleteGroupByIds(data.deleteGroupIds)
+  data.drawerVisible = false
+  if (result) {
+    message.success('删除成功！')
+  } else {
+    message.error('删除失败！')
+  }
+}
 
 data.selectedGroupId = dataStore.getGroups[0].id
 watch(() => dataStore.getGroups, (newVal, oldVal) => {
@@ -280,4 +339,27 @@ watch(() => dataStore.getGroups, (newVal, oldVal) => {
   }
 }
 
+.group-drawer {
+  .drawer-content {
+    .delete-checkbox-content {
+      &.hide-badge:after {
+        display: none;
+      }
+      &:after {
+        content: attr(data-count);
+        display: inline-block;
+        background-color: $text-color;
+        color: #fff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        font-size: 12px;
+        margin-left: 3px;
+        transform: scale(.75);
+      }
+    }
+  }
+}
 </style>
