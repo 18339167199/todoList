@@ -13,6 +13,7 @@
       <!-- search -->
       <a-row>
         <a-input-search
+          class="search-input"
           v-model:value="data.searchText"
           placeholder="搜索待办"
           size="large"
@@ -121,7 +122,7 @@
     }[data.drawerType]"
     placement="left"
     width="30%"
-    @after-visible-change="drawerVisibleChange"
+    @after-visible-change="resetDrawerContent"
   >
     <!-- group 新增修改 -->
     <a-row
@@ -197,9 +198,15 @@
         <a-button
           type="primary"
           @click="deleteGroups"
-        >确定</a-button>
+        >
+          确定
+        </a-button>
       </a-col>
     </a-row>
+  </a-drawer>
+
+  <a-drawer>
+    
   </a-drawer>
 </template>
 
@@ -259,11 +266,12 @@ const openDrawer = (type: DRAWER_TYPE, group?: Group) => {
   }
   data.drawerVisible = true
 }
-const drawerVisibleChange = (visible: boolean) => {
+const resetDrawerContent = (visible: boolean) => {
   if (!visible) {
     data.createGroupForm.id = -1
     data.createGroupForm.gname = ''
     data.createGroupForm.descr = ''
+    data.deleteGroupIds = []
   }
 }
 const createGroup = () => {
@@ -351,6 +359,21 @@ $text-color-list:
     .group-wrapper {
       position: relative;
       padding-top: 10px;
+
+      .search-input {
+        ::v-deep(.ant-input-wrapper) {
+          .ant-input {
+            border-top-left-radius: $border-radius;
+            border-bottom-left-radius: $border-radius;
+          }
+          .ant-input-group-addon {
+            &, & .ant-input-search-button {
+              border-top-right-radius: $border-radius;
+              border-bottom-right-radius: $border-radius;
+            }
+          } 
+        }
+      }
 
       .groups {
         padding-top: 10px;
