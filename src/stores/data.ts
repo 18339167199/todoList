@@ -241,6 +241,7 @@ export const useDataStore = defineStore('data', () => {
       return false
     }
     todo.id = ++todoIdCount.value
+    todo.createTime = getCurrentDateStr()
     todos.push(todo)
     group.count ++
     return true

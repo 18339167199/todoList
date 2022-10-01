@@ -105,6 +105,7 @@
       </a-row>
       <a-row class="main-content">
         <todo-list-comp :groupId="data.selectedGroupId"/>
+        <add-todo-comp :groupId="data.selectedGroupId"></add-todo-comp>
       </a-row>
     </a-layout-content>
   </a-layout>
@@ -207,6 +208,7 @@ import { reactive, ref, watch } from 'vue'
 import AvatarComp from '#/avatarComp.vue'
 import GroupComp from '#/groupComp.vue'
 import TodoListComp from '#/todoListComp.vue'
+import AddTodoComp from '#/addTodoComp.vue'
 import { message, type FormInstance } from 'ant-design-vue'
 import { SearchOutlined, DeleteOutlined, PlusOutlined, BgColorsOutlined } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
@@ -409,7 +411,7 @@ $text-color-list:
   .main {
     display: flex;
     flex-direction: column;
-    padding: 1% 2% 2% 2%;
+    padding: 1% 2% 4% 2%;
     background-color: var(--background-color);
     color: var(--text-color);
     @include transition('background-color', $default-transition-duration);
@@ -454,6 +456,7 @@ $text-color-list:
     }
 
     .main-content {
+      position: relative;
       flex: 1;
       padding-bottom: 4.5rem;
     }
