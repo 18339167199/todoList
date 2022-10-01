@@ -12,7 +12,7 @@
       </template>
 
       <a-row class="user-wrapper">
-        <a-avatar :size="parseInt(props.height.replace('px', '')) - 20" class="avatar">
+        <a-avatar :size="parseInt(props.height.replace('px', '')) - 20" class="avatar" :src="defaultAvatar">
           <template #icon><UserOutlined /></template>
         </a-avatar>
         <div class="info">
@@ -28,6 +28,7 @@
 import { useRouter } from 'vue-router'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
+import defaultAvatar from '@/assets/images/avatar.jpeg'
 
 const props = defineProps<{
   height: string
