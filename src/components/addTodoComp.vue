@@ -116,6 +116,7 @@ const createTodo = () => {
   const result = dataStore.addTodo(todo)
   if (result) {
     message.success('添加成功！')
+    clear()
   } else {
     message.error('添加失败！')
   }

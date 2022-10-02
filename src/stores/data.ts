@@ -254,6 +254,34 @@ export const useDataStore = defineStore('data', () => {
     todo[type] = value
     return true
   }
+  const updateTodo = (todo: Todo) => {
+    const originTodo = todos.find(t => t.id === todo.id)
+    if (!originTodo) {
+      return false
+    }
+    originTodo.content = todo.content
+    originTodo.note = todo.note
+    originTodo.scheduledTime = todo.scheduledTime
+    return true
+  }
+  const deleteTodo = (id: number): boolean => {
+    const todo = todos.find(todo => todo.id === id)
+
+    if (!todo) {
+      return false
+    }
+
+    const group = groups.find(group => group.id === todo.groupId)
+
+    if (!group) {
+      return false
+    }
+
+    todos.splice(todos.indexOf(todo), 1)
+    group.count --
+    return true
+  }
+  const getTodoById = (id: number) => todos.find(todo => todo.id === id)
 
   /**
    * Getters
@@ -297,6 +325,9 @@ export const useDataStore = defineStore('data', () => {
     deleteGroupByIds,
     addTodo,
     updateTodoStatus,
+    updateTodo,
+    deleteTodo,
+    getTodoById,
     hasLogined,
     getUserInfo,
     getGroups,

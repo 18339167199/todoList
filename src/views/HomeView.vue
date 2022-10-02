@@ -105,8 +105,12 @@
         </a-col>
       </a-row>
       <a-row class="main-content">
-        <todo-list-comp :groupId="data.selectedGroupId"/>
-        <add-todo-comp :groupId="data.selectedGroupId"></add-todo-comp>
+        <todo-list-comp
+          :groupId="data.selectedGroupId"
+        ></todo-list-comp>
+        <add-todo-comp
+          :groupId="data.selectedGroupId"
+        ></add-todo-comp>
       </a-row>
     </a-layout-content>
   </a-layout>
@@ -134,11 +138,15 @@
           name="createGroupForm"
           :model="data.createGroupForm"
           style="width: 100%"
-          :rules="data.createGroupFormRules"
           layout="vertical"
           @finish="createGroup"
           @finishFailed="() => { message.warn('请将信息填写完整！') }"
           ref="createGroupFormRef"
+          :rules="{
+            gname: [
+              { required: true, message: '请输入分组名称' },
+            ]
+          }"
         >
           <a-form-item name="gname" label="分组名称:">
             <a-input size="large" v-model:value="data.createGroupForm.gname" />
@@ -204,10 +212,6 @@
       </a-col>
     </a-row>
   </a-drawer>
-
-  <a-drawer>
-    
-  </a-drawer>
 </template>
 
 <script setup lang="ts">
@@ -217,12 +221,18 @@ import GroupComp from '#/groupComp.vue'
 import TodoListComp from '#/todoListComp.vue'
 import AddTodoComp from '#/addTodoComp.vue'
 import { message, type FormInstance } from 'ant-design-vue'
-import { SearchOutlined, DeleteOutlined, PlusOutlined, BgColorsOutlined } from '@ant-design/icons-vue'
+import {
+  SearchOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  BgColorsOutlined
+} from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
 import { getCurrentDateStr } from '@/utils/util'
 import type { Group } from '@/types'
 import { DRAWER_TYPE } from '@/utils/util'
 import LocalStorage from '@/utils/localStroage'
+import { Modal } from 'ant-design-vue'
 
 const dataStore = useDataStore()
 const data = reactive({
@@ -232,18 +242,13 @@ const data = reactive({
   drawerVisible: false,
   drawerType: DRAWER_TYPE.ADD_GROUP,
   drawerBtnLoading: false,
+  deleteGroupIds: [],
+  themeNumber: LocalStorage.get<number>('themeNumber') || 1,
   createGroupForm: {
     id: -1,
     gname: '',
     descr: '',
   },
-  createGroupFormRules: {
-    gname: [
-      { required: true, message: '请输入分组名称' },
-    ]
-  },
-  deleteGroupIds: [],
-  themeNumber: LocalStorage.get<number>('themeNumber') || 1,
 })
 const createGroupFormRef = ref<FormInstance>()
 const onSearch = () => {
@@ -304,13 +309,25 @@ const createGroup = () => {
   }, 1000)
 }
 const deleteGroups = () => {
-  const result = dataStore.deleteGroupByIds(data.deleteGroupIds)
-  data.drawerVisible = false
-  if (result) {
-    message.success('删除成功！')
-  } else {
-    message.error('删除失败！')
+  if (data.deleteGroupIds.length === 0) {
+    message.warn('请勾选要删除的分组！')
+    return
   }
+
+  Modal.confirm({
+    centered: true,
+    content: `分组中的待办将一起删除，确定要删除选中的分组吗？`,
+    cancelText: '取消',
+    onOk() {
+      const result = dataStore.deleteGroupByIds(data.deleteGroupIds)
+      data.drawerVisible = false
+      if (result) {
+        message.success('删除成功！')
+      } else {
+        message.error('删除失败！')
+      }
+    }
+  })
 }
 const selectTheme = (themeNumber: number) => {
   data.themeNumber = themeNumber
@@ -318,8 +335,7 @@ const selectTheme = (themeNumber: number) => {
 }
 
 data.selectedGroupId = dataStore.getGroups[0].id
-watch(() => dataStore.getGroups, (newVal, oldVal) => {
-  console.log(newVal, oldVal)
+watch(() => dataStore.getGroups, () => {
   const lastSelectedIdExit = dataStore.getGroups.some(group => group.id === data.selectedGroupId)
   if (!lastSelectedIdExit) {
     data.selectedGroupId = dataStore.getGroups[0].id
