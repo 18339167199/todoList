@@ -42,6 +42,14 @@
         />
       </div>
     </div>
+
+    <!-- 无数据时展示 -->
+    <div
+      class="no-todo-show"
+      v-show="!doneTodo.length && !undoneTodo.length"
+    >
+      暂无待办
+    </div>
   </a-row>
 
   <a-drawer
@@ -144,7 +152,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive } from 'vue'
+import { computed, reactive, onUnmounted } from 'vue'
 import TodoItemComp from '#/todoItemComp.vue'
 import { useDataStore } from '@/stores/data'
 import { DownOutlined } from '@ant-design/icons-vue'
@@ -152,19 +160,23 @@ import { MinusCircleOutlined, FieldTimeOutlined, BookFilled, DeleteOutlined } fr
 import type { Todo } from '@/types'
 import dayjs, { Dayjs } from 'dayjs'
 import { Modal, message } from 'ant-design-vue'
+import bus, { PASSKEYWORD } from '@/utils/bus'
 
 const props = defineProps<{
-  groupId: number
+  groupId: number,
+  searchMode: boolean
 }>()
 
 const dataStore = useDataStore()
 const data = reactive<{
   doneTodoShow: boolean,
   drawerVisible: boolean,
+  searchKeyWord: string,
   curTodo: Todo
 }>({
   doneTodoShow: true,
   drawerVisible: false,
+  searchKeyWord: '',
   curTodo: {
     id: -1,
     groupId: -1,
@@ -262,21 +274,32 @@ const getTodoStatus = computed(() => {
   }
 })
 
-const doneTodo = computed(() => dataStore
-  .getTodosByGroupId(props.groupId)
-  .filter(todo => !!todo.done)
-  .sort((a: Todo, b: Todo) => b.star - a.star)
-)
+const doneTodo = computed(() => {
+  let dataSource = props.searchMode
+    ? dataStore.searchTodo(data.searchKeyWord)
+    : dataStore.getTodosByGroupId(props.groupId)
+  return dataSource.filter(todo => !!todo.done).sort((a: Todo, b: Todo) => b.star - a.star)
+})
 
-const undoneTodo = computed(() => dataStore
-  .getTodosByGroupId(props.groupId)
-  .filter(todo => !todo.done)
-  .sort((a: Todo, b: Todo) => b.star - a.star)
-)
+const undoneTodo = computed(() => {
+  let dataSource = props.searchMode
+    ? dataStore.searchTodo(data.searchKeyWord)
+    : dataStore.getTodosByGroupId(props.groupId)
+  return dataSource.filter(todo => !todo.done).sort((a: Todo, b: Todo) => b.star - a.star)
+})
+
+bus.on(PASSKEYWORD, (keyWord: string) => {
+  data.searchKeyWord = keyWord
+})
+
+onUnmounted(() => {
+  bus.off(PASSKEYWORD)
+})
 </script>
 
 <style lang="scss" scoped>
 .todo-main {
+  position: relative;
   padding-top: 10px;
   width: 100%;
   flex-direction: column;
@@ -299,6 +322,15 @@ const undoneTodo = computed(() => dataStore
         }
       }
     }
+  }
+
+  .no-todo-show {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: .8rem;
+    font-weight: bolder;
   }
 }
 

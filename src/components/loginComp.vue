@@ -10,7 +10,6 @@
         password: [{ required: true, message: '请输入密码!' }]
       }"
       @finish="login"
-      @finishFailed="validateFailed"
       ref="form"
     >
       <!-- username -->
@@ -84,9 +83,6 @@ const login = () => {
     globalLoading.hide()
     message.error(err.message)
   })
-}
-const validateFailed = () => {
-  console.log('validateFailed!')
 }
 </script>
 

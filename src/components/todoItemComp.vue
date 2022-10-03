@@ -58,7 +58,7 @@ $height: 40px;
   cursor: pointer;
   display: flex;
   justify-content: flex-start;
-  align-items: center999;
+  align-items: center;
 
   &.active {
     .check {

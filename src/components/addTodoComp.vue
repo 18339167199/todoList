@@ -2,7 +2,7 @@
   <a-row class="add-todo">
     <a-input
       class="add-todo-input"
-      v-model:value="createTodoInfo.content"
+      v-model:value.trim="createTodoInfo.content"
       placeholder="添加待办"
       size="large"
       ref="addTodoInput"

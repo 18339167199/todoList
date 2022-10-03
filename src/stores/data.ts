@@ -282,6 +282,11 @@ export const useDataStore = defineStore('data', () => {
     return true
   }
   const getTodoById = (id: number) => todos.find(todo => todo.id === id)
+  const searchTodo = (keyWord: string): Todo[] => {
+    const loginUserId = loginUser.value.id
+    const groupIds = groups.filter(group => group.userId === loginUserId).map(group => group.id)
+    return todos.filter(todo => groupIds.includes(todo.groupId) && todo.content.includes(keyWord))
+  }
 
   /**
    * Getters
@@ -328,6 +333,7 @@ export const useDataStore = defineStore('data', () => {
     updateTodo,
     deleteTodo,
     getTodoById,
+    searchTodo,
     hasLogined,
     getUserInfo,
     getGroups,

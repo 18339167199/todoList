@@ -14,10 +14,11 @@
       <a-row>
         <a-input-search
           class="search-input"
-          v-model:value="data.searchText"
+          v-model:value.trim="data.searchKeyWord"
           placeholder="搜索待办"
           size="large"
           @search="onSearch"
+          @change="searchKeyWordChange"
         >
           <template #enterButton>
             <a-button>
@@ -69,7 +70,13 @@
     <a-layout-content class="main" :data-color-mode="data.themeNumber">
       <a-row class="main-header">
         <a-col :span="12" style="text-align: left">
-          <h1>{{ dataStore.getGroupNameById(data.selectedGroupId) }}</h1>
+          <h1>
+            {{
+              data.searchMode
+                ? `"${data.curSearchKeyWord}"搜索结果`
+                : dataStore.getGroupNameById(data.selectedGroupId)
+            }}
+          </h1>
         </a-col>
         <a-col
           :span="12" style="display: flex;
@@ -106,10 +113,11 @@
       </a-row>
       <a-row class="main-content">
         <todo-list-comp
-          :groupId="data.selectedGroupId"
+          :group-id="data.selectedGroupId"
+          :search-mode="data.searchMode"
         ></todo-list-comp>
         <add-todo-comp
-          :groupId="data.selectedGroupId"
+          :group-id="data.selectedGroupId"
         ></add-todo-comp>
       </a-row>
     </a-layout-content>
@@ -233,11 +241,15 @@ import type { Group } from '@/types'
 import { DRAWER_TYPE } from '@/utils/util'
 import LocalStorage from '@/utils/localStroage'
 import { Modal } from 'ant-design-vue'
+import bus, { PASSKEYWORD } from '@/utils/bus'
+import globalLoading from '@/utils/globalLoading'
 
 const dataStore = useDataStore()
 const data = reactive({
   avatarH: '80px',
-  searchText: '',
+  searchKeyWord: '',
+  searchMode: false,
+  curSearchKeyWord: '',
   selectedGroupId: -1,
   drawerVisible: false,
   drawerType: DRAWER_TYPE.ADD_GROUP,
@@ -252,10 +264,19 @@ const data = reactive({
 })
 const createGroupFormRef = ref<FormInstance>()
 const onSearch = () => {
-  if (!data.searchText) {
+  if (!data.searchKeyWord) {
     message.warn('请输入搜索内容！')
     return
   }
+
+  globalLoading.show()
+  setTimeout(() => {
+    globalLoading.hide()
+    data.curSearchKeyWord = data.searchKeyWord
+    bus.emit(PASSKEYWORD, data.searchKeyWord)
+    data.searchMode = true
+    data.selectedGroupId = -1
+  }, 1000)
 }
 const selectGroup = (groupId: number) => {
   if (groupId && groupId > 0) {
@@ -313,7 +334,6 @@ const deleteGroups = () => {
     message.warn('请勾选要删除的分组！')
     return
   }
-
   Modal.confirm({
     centered: true,
     content: `分组中的待办将一起删除，确定要删除选中的分组吗？`,
@@ -333,6 +353,13 @@ const selectTheme = (themeNumber: number) => {
   data.themeNumber = themeNumber
   LocalStorage.set('themeNumber', themeNumber)
 }
+const searchKeyWordChange = () => {
+  if (!data.searchKeyWord && data.searchMode) {
+    data.searchMode = false
+    data.selectedGroupId = dataStore.getGroups.length > 0 ? dataStore.getGroups[0].id : -1
+    data.curSearchKeyWord = ''
+  }
+}
 
 data.selectedGroupId = dataStore.getGroups[0].id
 watch(() => dataStore.getGroups, () => {
@@ -340,6 +367,12 @@ watch(() => dataStore.getGroups, () => {
   if (!lastSelectedIdExit) {
     data.selectedGroupId = dataStore.getGroups[0].id
   }
+})
+watch(() => data.selectedGroupId, (newVal) => {
+  if (newVal < 0) {
+    return
+  }
+  data.searchMode = false
 })
 </script>
 
@@ -475,7 +508,6 @@ $text-color-list:
         color: inherit;
         font-size: inherit;
         font-weight: bold;
-        letter-spacing: .2rem;
         margin: 0;
         line-height: $headerH;
       }

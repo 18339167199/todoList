@@ -76,9 +76,6 @@ const onDelete = () => {
       } else {
         message.error('删除失败！')
       }
-    },
-    onCancel() {
-      console.log('cancel')
     }
   })
 }
