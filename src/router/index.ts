@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useDataStore } from '@/stores/data'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,14 +21,6 @@ const router = createRouter({
       component: () => import(/* webpackChunkName: "LoginView" */ '@/views/LoginAndRegisterView.vue'),
       meta: {
         requireAuth: false,
-      }
-    },
-    {
-      path: '/todo/:id',
-      name: 'todo',
-      component: () => import(/* webpackChunkName: "RegisterView" */ '@/views/TodoView.vue'),
-      meta: {
-        requireAuth: true,
       }
     },
     { 
