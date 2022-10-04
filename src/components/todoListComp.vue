@@ -88,7 +88,7 @@
         "
       >
         <ul class="action has-hover-style">
-          <li><MinusCircleOutlined />移动到其他分组</li>
+          <li @click="data.modalVisible = true"><MinusCircleOutlined />移动到其他分组</li>
         </ul>
       </a-col>
 
@@ -149,6 +149,27 @@
       </a-col>
     </a-row>
   </a-drawer>
+
+  <!-- 移动 todo 到其他分组 Modal -->
+  <a-modal
+    v-model:visible="data.modalVisible"
+    title="请选择分组"
+    @ok="moveToGroup"
+    @cancel="data.selectedGroupKeys = []"
+  >
+    <a-table
+      :data-source="tableData"
+      :columns="tableColumns"
+      :pagination="false"
+      emptyText="暂无分组"
+      :row-selection="{
+        selectedRowKeys: data.selectedGroupKeys,
+        onChange: onSelectChange,
+        type: 'radio',
+        columnWidth: '100px'
+      }"
+    />
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
@@ -172,11 +193,15 @@ const data = reactive<{
   doneTodoShow: boolean,
   drawerVisible: boolean,
   searchKeyWord: string,
+  modalVisible: boolean,
+  selectedGroupKeys: number[],
   curTodo: Todo
 }>({
   doneTodoShow: true,
   drawerVisible: false,
   searchKeyWord: '',
+  modalVisible: false,
+  selectedGroupKeys: [],
   curTodo: {
     id: -1,
     groupId: -1,
@@ -254,24 +279,54 @@ const afterVisibleChange = (bool: boolean) => {
   }
 }
 
+const tableColumns = [
+  {
+    title: '分组名称',
+    key: 'gname',
+    dataIndex: 'gname'
+  },
+  {
+    title: '分组描述',
+    key: 'descr',
+    dataIndex: 'descr'
+  }
+]
+const tableData = computed(() => dataStore.getGroups.map(group => ({
+  key: group.id,
+  ...group
+})))
+const moveToGroup = () => {
+  if (data.curTodo.id < 0 || data.selectedGroupKeys.length === 0) {
+    message.warn('请选择一个分组！')
+    return
+  }
+  const result = dataStore.moveToGroup(data.curTodo.id, data.selectedGroupKeys[0])
+  if (result) {
+    data.modalVisible = false
+    data.drawerVisible = false
+    message.success(`待办已移动到${dataStore.getGroupNameById(data.curTodo.groupId)}！`)
+  } else {
+    message.error('待办移动到其他分组失败！')
+  }
+}
+const onSelectChange = (selectedGroupKeys: number[]) => {
+  data.selectedGroupKeys = selectedGroupKeys
+}
+
+const tagConfig = {
+  'finish': { color: 'green', text: '完成' },
+  'pending': { color: 'warning', text: '待完成' },
+  'expired': { color: 'red', text: '已过期' }
+}
 const getTodoStatus = computed(() => {
   if (data.curTodo.done) {
-    return {
-      color: 'green',
-      text: '完成'
-    }
+    return tagConfig.finish
   }
   if (data.curTodo.scheduledTime) {
     const isExpired = new Date(data.curTodo.scheduledTime).getTime() > new Date().getTime()
-    return {
-      color: isExpired ? 'warning' : 'danger',
-      text: isExpired ? '待完成' : '已过期'
-    }
+    return isExpired ? tagConfig.pending : tagConfig.expired 
   }
-  return {
-    color: 'warning',
-    text: '待完成'
-  }
+  return tagConfig.pending
 })
 
 const doneTodo = computed(() => {

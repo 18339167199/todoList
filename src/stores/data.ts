@@ -194,6 +194,7 @@ export const useDataStore = defineStore('data', () => {
   }
 
   // group
+  const getGroupById = (id: number) => groups.find(group => group.id === id)
   const addGroup = (group: Group) => {
     group.id = ++groupIdCount.value
     if (group.userId > 0) {
@@ -203,7 +204,7 @@ export const useDataStore = defineStore('data', () => {
     return false
   }
   const updateGroup= ({ id, gname, descr }: { id: number, gname: string, descr: string }) => {
-    const group = groups.find(g => g.id === id)
+    const group = getGroupById(id)
     if (!group) {
       return false
     }
@@ -213,7 +214,7 @@ export const useDataStore = defineStore('data', () => {
     return true
   }
   const deleteGroup = (id: number) => {
-    const group = groups.find(g => g.id === id)
+    const group = getGroupById(id)
     if (!group) {
       return false
     }
@@ -226,7 +227,7 @@ export const useDataStore = defineStore('data', () => {
     return true
   }
   const deleteGroupByIds = (ids: number[]) => {
-    const isIdsAllExist = ids.every(id => !!groups.find(group => group.id === id))
+    const isIdsAllExist = ids.every(id => !!getGroupById(id))
     if (!isIdsAllExist) {
       return false
     }
@@ -235,8 +236,9 @@ export const useDataStore = defineStore('data', () => {
   }
 
   // todo
+  const getTodoById = (id: number) => todos.find(todo => todo.id === id)
   const addTodo = (todo: Todo): boolean => {
-    const group = groups.find(group => group.id === todo.groupId)
+    const group = getGroupById(todo.groupId)
     if (!group) {
       return false
     }
@@ -247,7 +249,7 @@ export const useDataStore = defineStore('data', () => {
     return true
   }
   const updateTodoStatus = ({ id, type, value }: { id: number, type: 'done' | 'star', value: 0 | 1 }) => {
-    const todo = todos.find(todo => todo.id === id)
+    const todo = getTodoById(id)
     if (!todo) {
       return false
     }
@@ -255,7 +257,7 @@ export const useDataStore = defineStore('data', () => {
     return true
   }
   const updateTodo = (todo: Todo) => {
-    const originTodo = todos.find(t => t.id === todo.id)
+    const originTodo = getTodoById(todo.id)
     if (!originTodo) {
       return false
     }
@@ -265,13 +267,13 @@ export const useDataStore = defineStore('data', () => {
     return true
   }
   const deleteTodo = (id: number): boolean => {
-    const todo = todos.find(todo => todo.id === id)
+    const todo = getTodoById(id)
 
     if (!todo) {
       return false
     }
 
-    const group = groups.find(group => group.id === todo.groupId)
+    const group = getGroupById(todo.groupId)
 
     if (!group) {
       return false
@@ -281,11 +283,29 @@ export const useDataStore = defineStore('data', () => {
     group.count --
     return true
   }
-  const getTodoById = (id: number) => todos.find(todo => todo.id === id)
   const searchTodo = (keyWord: string): Todo[] => {
     const loginUserId = loginUser.value.id
     const groupIds = groups.filter(group => group.userId === loginUserId).map(group => group.id)
     return todos.filter(todo => groupIds.includes(todo.groupId) && todo.content.includes(keyWord))
+  }
+  const moveToGroup = (todoId: number, groupId: number) => {
+    const todo = getTodoById(todoId)
+    const afterGroup = getGroupById(groupId)
+
+    if (!todo || !afterGroup || todo.groupId === afterGroup.id) {
+      return false
+    }
+
+    const beforeGroup = getGroupById(todo.groupId)
+
+    if (!beforeGroup) {
+      return false
+    }
+
+    beforeGroup.count --
+    afterGroup.count ++
+    todo.groupId = afterGroup.id
+    return true
   }
 
   /**
@@ -328,12 +348,13 @@ export const useDataStore = defineStore('data', () => {
     updateGroup,
     deleteGroup,
     deleteGroupByIds,
+    getTodoById,
     addTodo,
     updateTodoStatus,
     updateTodo,
     deleteTodo,
-    getTodoById,
     searchTodo,
+    moveToGroup,
     hasLogined,
     getUserInfo,
     getGroups,
