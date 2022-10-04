@@ -364,7 +364,7 @@ const searchKeyWordChange = () => {
 data.selectedGroupId = dataStore.getGroups[0].id
 watch(() => dataStore.getGroups, () => {
   const lastSelectedIdExit = dataStore.getGroups.some(group => group.id === data.selectedGroupId)
-  if (!lastSelectedIdExit) {
+  if (!lastSelectedIdExit && dataStore.getGroups.length > 0) {
     data.selectedGroupId = dataStore.getGroups[0].id
   }
 })
