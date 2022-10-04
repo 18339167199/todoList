@@ -160,7 +160,7 @@ import { MinusCircleOutlined, FieldTimeOutlined, BookFilled, DeleteOutlined } fr
 import type { Todo } from '@/types'
 import dayjs, { Dayjs } from 'dayjs'
 import { Modal, message } from 'ant-design-vue'
-import bus, { PASSKEYWORD } from '@/utils/bus'
+import bus from '@/utils/bus'
 
 const props = defineProps<{
   groupId: number,
@@ -288,12 +288,13 @@ const undoneTodo = computed(() => {
   return dataSource.filter(todo => !todo.done).sort((a: Todo, b: Todo) => b.star - a.star)
 })
 
-bus.on(PASSKEYWORD, (keyWord: string) => {
+const passKeyWordFunc = (keyWord: string) => {
   data.searchKeyWord = keyWord
-})
+}
+bus.on('passKeyWord', passKeyWordFunc)
 
 onUnmounted(() => {
-  bus.off(PASSKEYWORD)
+  bus.off('passKeyWord', passKeyWordFunc)
 })
 </script>
 

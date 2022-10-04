@@ -241,7 +241,7 @@ import type { Group } from '@/types'
 import { DRAWER_TYPE } from '@/utils/util'
 import LocalStorage from '@/utils/localStroage'
 import { Modal } from 'ant-design-vue'
-import bus, { PASSKEYWORD } from '@/utils/bus'
+import bus from '@/utils/bus'
 import globalLoading from '@/utils/globalLoading'
 
 const dataStore = useDataStore()
@@ -273,10 +273,10 @@ const onSearch = () => {
   setTimeout(() => {
     globalLoading.hide()
     data.curSearchKeyWord = data.searchKeyWord
-    bus.emit(PASSKEYWORD, data.searchKeyWord)
+    bus.emit('passKeyWord', data.searchKeyWord)
     data.searchMode = true
     data.selectedGroupId = -1
-  }, 1000)
+  }, 500)
 }
 const selectGroup = (groupId: number) => {
   if (groupId && groupId > 0) {
