@@ -31,19 +31,24 @@
 import type { Todo } from '@/types'
 import { CheckOutlined, StarFilled, StarOutlined } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
+import { message } from 'ant-design-vue'
 
-const props = defineProps<{
-  data: Todo
-}>()
-
+const props = defineProps<{ data: Todo }>()
 const dataStore = useDataStore()
-
 const updateTodoStatus = (type: 'done' | 'star', value: 0 | 1) => {
-  dataStore.updateTodoStatus({
+  const result = dataStore.updateTodoStatus({
     id: props.data.id,
     type,
     value
   })
+  if (result) {
+    message.success(type === 'done'
+      ? `已标记为${value ? '' : '未'}完成`
+      : `已标记为${value ? '' : '不'}重要`
+    )
+  } else {
+    message.error('操作失败！')
+  }
 }
 </script>
 
