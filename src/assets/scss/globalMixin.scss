@@ -43,7 +43,7 @@
 
     ::v-deep(.anticon) {
       margin-right: 5px;
-      margin-top: 1px;
+      transform: translateY(1px);
     }
     &:last-of-type {
       &::after { display: none; }

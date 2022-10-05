@@ -96,6 +96,22 @@
       >
         <ul class="action has-hover-style">
           <li @click="data.modalVisible = true"><MinusCircleOutlined />移动到其他分组</li>
+          <li @click="updateTodoStatus('done', !!data.curTodo.done ? 0 : 1)">
+            <template v-if="!data.curTodo.done">
+              <CheckCircleOutlined/>标记为完成
+            </template>
+            <template v-else>
+              <CheckCircleFilled />标记为未完成
+            </template>
+          </li>
+          <li @click="updateTodoStatus('star', !!data.curTodo.star ? 0 : 1)">
+            <template v-if="!data.curTodo.star">
+              <StarOutlined />标记为重要
+            </template>
+            <template v-else>
+              <StarFilled />标记为不重要
+            </template>
+          </li>
         </ul>
       </a-col>
 
@@ -169,11 +185,12 @@
       :columns="tableColumns"
       :pagination="false"
       emptyText="暂无分组"
+      size="small"
       :row-selection="{
         selectedRowKeys: data.selectedGroupKeys,
         onChange: onSelectChange,
         type: 'radio',
-        columnWidth: '100px'
+        columnWidth: '60px'
       }"
     />
   </a-modal>
@@ -184,7 +201,16 @@ import { computed, reactive, onUnmounted, ref } from 'vue'
 import TodoItemComp from '#/todoItemComp.vue'
 import { useDataStore } from '@/stores/data'
 import { DownOutlined } from '@ant-design/icons-vue'
-import { MinusCircleOutlined, FieldTimeOutlined, BookFilled, DeleteOutlined } from '@ant-design/icons-vue'
+import {
+  MinusCircleOutlined,
+  FieldTimeOutlined,
+  BookFilled,
+  DeleteOutlined,
+  CheckCircleOutlined,
+  CheckCircleFilled,
+  StarOutlined,
+  StarFilled
+} from '@ant-design/icons-vue'
 import type { Todo } from '@/types'
 import dayjs, { Dayjs } from 'dayjs'
 import { Modal, message } from 'ant-design-vue'
@@ -270,6 +296,22 @@ const saveTodo = () => {
   } else {
     message.error('更新失败！')
   }
+}
+const updateTodoStatus = (type: 'done' | 'star', value: 0 | 1) => {
+  const result = dataStore.updateTodoStatus({
+    id: data.curTodo.id,
+    type,
+    value
+  })
+  if (!result) {
+    message.error('更新失败！')
+    return
+  }
+  data.curTodo[type] = value
+  message.success(type === 'done'
+    ? `已标记为${value ? '' : '未'}完成`
+    : `已标记为${value ? '' : '不'}重要`
+  )
 }
 const iscurTodoChange = () => {
   const originTodo = dataStore.getTodoById(data.curTodo.id)
@@ -413,7 +455,7 @@ onUnmounted(() => {
     padding: 10px 20px;
     margin-bottom: 10px;
     ::v-deep(.anticon) {
-      font-size: 16px;
+      font-size: 1rem;
     }
   }
 
