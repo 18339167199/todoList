@@ -1,5 +1,5 @@
 import { ref, computed, reactive } from 'vue'
-import { defineStore, type StoreState } from 'pinia'
+import { defineStore } from 'pinia'
 import type { Todo, Group, User } from '@/types'
 import LocalStorage from '@/utils/localStroage'
 import { getCurrentDateStr } from '@/utils/util'
