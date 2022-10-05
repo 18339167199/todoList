@@ -254,6 +254,7 @@ export const useDataStore = defineStore('data', () => {
       return false
     }
     todo[type] = value
+    todo.updateTime = getCurrentDateStr()
     return true
   }
   const updateTodo = (todo: Todo) => {
@@ -263,22 +264,20 @@ export const useDataStore = defineStore('data', () => {
     }
     originTodo.content = todo.content
     originTodo.note = todo.note
+    originTodo.updateTime = getCurrentDateStr()
     originTodo.scheduledTime = todo.scheduledTime
     return true
   }
   const deleteTodo = (id: number): boolean => {
     const todo = getTodoById(id)
-
     if (!todo) {
       return false
     }
-
     const group = getGroupById(todo.groupId)
 
     if (!group) {
       return false
     }
-
     todos.splice(todos.indexOf(todo), 1)
     group.count --
     return true
@@ -291,19 +290,16 @@ export const useDataStore = defineStore('data', () => {
   const moveToGroup = (todoId: number, groupId: number) => {
     const todo = getTodoById(todoId)
     const afterGroup = getGroupById(groupId)
-
     if (!todo || !afterGroup || todo.groupId === afterGroup.id) {
       return false
     }
-
     const beforeGroup = getGroupById(todo.groupId)
-
     if (!beforeGroup) {
       return false
     }
-
     beforeGroup.count --
     afterGroup.count ++
+    todo.updateTime = getCurrentDateStr()
     todo.groupId = afterGroup.id
     return true
   }
