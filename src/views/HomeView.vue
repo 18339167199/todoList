@@ -115,10 +115,14 @@
         <todo-list-comp
           :group-id="data.selectedGroupId"
           :search-mode="data.searchMode"
-        ></todo-list-comp>
+        />
+        <div class="space"></div>
+      </a-row>
+      <a-row class="main-footer">
         <add-todo-comp
-          :group-id="data.selectedGroupId"
-        ></add-todo-comp>
+        :group-id="data.selectedGroupId"
+        v-show="!data.searchMode"
+      />
       </a-row>
     </a-layout-content>
   </a-layout>
@@ -483,7 +487,7 @@ $text-color-list:
   .main {
     display: flex;
     flex-direction: column;
-    padding: 1% 2% 4% 2%;
+    padding: 0 2rem;
     background-color: var(--background-color);
     color: var(--text-color);
     @include transition('background-color', $default-transition-duration);
@@ -529,7 +533,17 @@ $text-color-list:
     .main-content {
       position: relative;
       flex: 1;
-      padding-bottom: 4.5rem;
+      overflow-y: scroll;
+      border-radius: $border-radius;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .main-footer {
+      padding-top: .5rem;
+      background-color: var(--background-color);
+      height: $headerH * 1.5;
     }
   }
 }

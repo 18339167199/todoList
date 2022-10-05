@@ -19,6 +19,9 @@
       class="undone-todo"
       :span="24"
       v-show="doneTodo.length > 0"
+      :style="{
+        'margin-top': undoneTodo.length === 0 ? '0' : '10px'
+      }"
     >
       <div class="fold-button-wrapper">
         <a-button @click="() => { data.doneTodoShow = !data.doneTodoShow }">
@@ -50,6 +53,8 @@
     >
       暂无待办
     </div>
+
+    <div style="height: 5rem;"></div>
   </a-row>
 
   <a-drawer

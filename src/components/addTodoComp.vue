@@ -125,21 +125,23 @@ const createTodo = () => {
 
 <style lang="scss" scoped>
 .add-todo {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   width: 100%;
 
   &-input {
-    border-radius: $border-radius;
+    ::v-deep(.ant-input-group) {
+      .ant-input-affix-wrapper {
+        border-top-left-radius: $border-radius;
+        border-bottom-left-radius: $border-radius;
+      }
+      .ant-input-group-addon {
+        border-top-right-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
+        padding: 0;
+      }
+    }
 
     ::v-deep(.ant-input-prefix) {
       margin-right: 10px
-    }
-
-    ::v-deep(.ant-input-group-addon) {
-      padding: 0;
     }
 
     @mixin hover-style() {
