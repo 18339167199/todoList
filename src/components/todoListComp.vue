@@ -69,12 +69,14 @@
           <a-tag :color="getTodoStatus.color">{{ getTodoStatus.text }}</a-tag>
         </div>
         <div class="preview-content">
-          <a-input
+          <a-textarea
             :class="{ active: !!data.curTodo.done }"
             v-model:value="data.curTodo.content"
             :bordered="false"
+            :rows="4"
             style="padding-left: 0; padding-right: 0;"
-          ></a-input>
+            ref="drawerContentTextarea"
+          />
         </div>
       </a-col>
 
@@ -128,7 +130,7 @@
           show-count
           :maxlength="200"
           v-model:value="data.curTodo.note"
-        ></a-textarea>
+        />
       </a-col>
 
       <!-- button -->
@@ -173,7 +175,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, onUnmounted } from 'vue'
+import { computed, reactive, onUnmounted, ref } from 'vue'
 import TodoItemComp from '#/todoItemComp.vue'
 import { useDataStore } from '@/stores/data'
 import { DownOutlined } from '@ant-design/icons-vue'
@@ -214,6 +216,7 @@ const data = reactive<{
     scheduledTime: ''
   }
 })
+const drawerContentTextarea = ref()
 const disabledDate = (current: Dayjs) => {
   return dayjs().isAfter(current.endOf('day'))
 }
@@ -276,6 +279,8 @@ const iscurTodoChange = () => {
 const afterVisibleChange = (bool: boolean) => {
   if (!bool && iscurTodoChange()) {
     saveTodo()
+  } else {
+    drawerContentTextarea.value?.focus()
   }
 }
 
@@ -291,10 +296,10 @@ const tableColumns = [
     dataIndex: 'descr'
   }
 ]
-const tableData = computed(() => dataStore.getGroups.map(group => ({
-  key: group.id,
-  ...group
-})))
+const tableData = computed(() => dataStore.getGroups
+  .filter(group => group.id !== data.curTodo.groupId)
+  .map(group => ({ key: group.id, ...group}))
+)
 const moveToGroup = () => {
   if (data.curTodo.id < 0 || data.selectedGroupKeys.length === 0) {
     message.warn('请选择一个分组！')
@@ -304,7 +309,7 @@ const moveToGroup = () => {
   if (result) {
     data.modalVisible = false
     data.drawerVisible = false
-    message.success(`待办已移动到${dataStore.getGroupNameById(data.curTodo.groupId)}！`)
+    message.success(`待办已移动到"${dataStore.getGroupNameById(data.selectedGroupKeys[0])}"！`)
   } else {
     message.error('待办移动到其他分组失败！')
   }
@@ -360,7 +365,12 @@ onUnmounted(() => {
   width: 100%;
   flex-direction: column;
 
+  .done-todo {
+    width: 100%;
+  }
+
   .undone-todo {
+    width: 100%;
     margin-top: 10px;
     text-align: left;
     .fold-button-wrapper {

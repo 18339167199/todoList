@@ -59,6 +59,7 @@ $height: 40px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  flex-wrap: nowrap;
 
   &.active {
     .check {
@@ -89,6 +90,7 @@ $height: 40px;
     text-align: center;
     line-height: $height;
     flex-grow: 0;
+    flex-shrink: 0;
     
     .circle {
       position: absolute;
@@ -121,18 +123,22 @@ $height: 40px;
     }
   }
   .content {
-    flex-grow: 1;
+    height: 100%;
     line-height: $height;
     text-align: left;
     padding: 0 2%;
     font-size: 14px;
     color: $text-color;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    flex-grow: 1;
+    flex-shrink: 1;
     &.active {
       text-decoration: line-through;
     }
   }
   .star {
-    flex-grow: 0;
     width: 40px;
     height: 100%;
     display: flex;
@@ -141,6 +147,8 @@ $height: 40px;
     color: $text-color;
     font-size: 20px;
     cursor: pointer;
+    flex-grow: 0;
+    flex-shrink: 0;
   }
 }
 </style>
