@@ -535,8 +535,33 @@ $text-color-list:
       flex: 1;
       overflow-y: scroll;
       border-radius: $border-radius;
+      // 滚动条整体
       &::-webkit-scrollbar {
-        display: none;
+        z-index: 50;
+        width: 6px;
+        height: 3px;
+        background: transparent;
+        opacity: 0;
+      }
+
+      // 滚动滑块样式
+      &::-webkit-scrollbar-thumb {
+        -webkit-border-radius: $border-radius;
+        -moz-border-radius: $border-radius;
+        border-radius: $border-radius;
+        background: rgba(#909399, 0);
+        transition: all 1s;
+      }
+      &:hover::-webkit-scrollbar-thumb {
+        background: rgba(#909399, 1);
+      }
+
+      // 滚动条上下的箭头按钮
+      &::-webkit-scrollbar-button {
+          display: none;
+      }
+      ::-webkit-scrollbar-corner {
+          display: none;
       }
     }
 
