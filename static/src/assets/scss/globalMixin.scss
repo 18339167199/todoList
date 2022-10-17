@@ -1,0 +1,60 @@
+@mixin box-shadow($bulr: 20px, $color: #1989fa7a) {
+  -webkit-box-shadow: 0px 0px $bulr $color;
+  -moz-box-shadow: 0px 0px $bulr $color;
+  box-shadow: 0px 0px $bulr $color;
+}
+
+@mixin transition($props, $duration) {
+  transition-property: #{$props};
+  transition-duration: $duration;
+}
+
+@mixin ul-style() {
+  padding: 0;
+  list-style: none;
+  margin-bottom: 0;
+  &.has-hover-style {
+    li {
+      cursor: pointer;
+      @include transition('background-color', $default-transition-duration);
+      &:hover {
+        background-color: $hover-color;
+        &::after { opacity: 0; }
+      }
+    }
+  }
+  li {
+    position: relative;
+    border-radius: $border-radius;
+    padding: 10px 10px;
+
+    &::after {
+      content: '';
+      border-top: 1px solid $border-color;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      bottom: 0;
+      display: block;
+      opacity: 1;
+      @include transition('opacity', $default-transition-duration);
+    }
+
+    ::v-deep(.anticon) {
+      margin-right: 5px;
+      transform: translateY(1px);
+    }
+    &:last-of-type {
+      &::after { display: none; }
+    }
+
+    .label {
+      white-space: nowrap;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-right: 5px;
+    }
+  }
+}
