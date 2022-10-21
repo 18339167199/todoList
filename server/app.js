@@ -36,7 +36,7 @@ app.use('/todos', todosRouter);
 app.use('/groups', groupsRouter);
 
 
-// catch 404 and forward to error handler
+// catch 4r04 and forward to error handle
 app.use(function(req, res, next) {
   next(createError(404));
 });
