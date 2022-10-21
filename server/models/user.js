@@ -5,7 +5,8 @@ const UserSchema = new mongoose.Schema({
     username: String,
     password: String,
     nikeName: String,
-    email: String
+    email: String,
+    createTime: Date
 })
 
-export default UserSchema
+module.exports = mongoose.model('User', UserSchema)

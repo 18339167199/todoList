@@ -10,4 +10,4 @@ const GroupSchema = new mongoose.Schema({
     updateTime: String
 })
 
-export default GroupSchema
+module.exports = mongoose.model('Group', GroupSchema)

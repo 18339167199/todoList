@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const TodoSchema = new mongoose.Schema({
     id: { type: Number, require: true },
@@ -22,4 +22,5 @@ TodoSchema.virtual('expried').get(function() {
     }
 })
 
-export default TodoSchema
+module.exports = mongoose.model('Todo', TodoSchema)
+
