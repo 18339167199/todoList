@@ -3,7 +3,7 @@ class CommonResp {
     constructor({ code, data, msg }) {
         this.code = code
         this.data = data || null
-        this.msg = msg
+        this.msg = msg || ''
     }
 
     setCode(code) {

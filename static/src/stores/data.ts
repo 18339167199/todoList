@@ -4,12 +4,14 @@ import type { Todo, Group, User } from '@/types'
 import LocalStorage from '@/utils/localStroage'
 import { getCurrentDateStr } from '@/utils/util'
 
+import { loginApi, getUserInfoApi } from '@/api/user'
+import { TOKEN, TOKEN_EXPIRED } from '@/utils/constant'
+
 export const useDataStore = defineStore('data', () => {
   const todos = reactive<Todo[]>([])
   const groups = reactive<Group[]>([])
   const users = reactive<User[]>([])
-  const loginUser = ref<User>({ // 当前登录的用户
-    id: -1,
+  const loginUser = ref<User>({
     username: '',
     password: '',
     nikeName: '',
@@ -24,78 +26,42 @@ export const useDataStore = defineStore('data', () => {
    * Actions
    */
 
-  const restoreFromLocalStroage = () => {
-    const dataFromLocalStorage = LocalStorage.get<{
-      todos: Todo[],
-      groups: Group[],
-      users: User[],
-      loginUser: User,
-      todoIdCount: number,
-      groupIdCount: number,
-      userIdCount: number
-    }>('state')
-
-    if (!dataFromLocalStorage) {
-      return
-    }
-
-    if (dataFromLocalStorage.todos) {
-      todos.splice(0, todos.length)
-      todos.push(...dataFromLocalStorage.todos)
-    }
-
-    if (dataFromLocalStorage.groups) {
-      groups.splice(0, groups.length)
-      groups.push(...dataFromLocalStorage.groups)
-    }
-
-    if (dataFromLocalStorage.users) {
-      users.splice(0, users.length)
-      users.push(...dataFromLocalStorage.users)
-    }
-
-    if (dataFromLocalStorage.loginUser) {
-      loginUser.value = dataFromLocalStorage.loginUser
-    }
-
-    if (dataFromLocalStorage.todoIdCount) {
-      todoIdCount.value = dataFromLocalStorage.todoIdCount
-    }
-
-    if (dataFromLocalStorage.groupIdCount) {
-      groupIdCount.value = dataFromLocalStorage.groupIdCount
-    }
-
-    if (dataFromLocalStorage.userIdCount) {
-      userIdCount.value = dataFromLocalStorage.userIdCount
+  const restoreUserInfo = async () => {
+    try {
+      const { code, data } = await getUserInfoApi()
+      if (code === 0) {
+        loginUser.value = data
+      }
+    } catch (err) {
+      console.log('dataStore 33 line', err)
     }
   }
 
-  const login = ({ username, password }: { username: string, password: string }) => {
-    return new Promise<{
-      msg: string,
-      data: User
-    }>((resolve, reject) => {
-      const user = users.find(user => user.username === username && user.password === password)
-
-      if (!user) {
-        reject(new Error('用户名或密码错误，请检查后重试！'))
-        return
-      }
-
-      // 登录成功
-      loginUser.value = user
-
-      setTimeout(resolve, 1000, {
-        msg: `欢迎回来！${user.nikeName}`,
-        data: user
+  const login = (data: { username: string, password: string }):Promise<{
+    msg: string,
+    data: User
+  }> => {
+    return new Promise((resolve, reject) => {
+      loginApi(data).then(resp => {
+        if (resp.code === 0) {
+          loginUser.value = resp.data.userInfo
+          LocalStorage.set(TOKEN, resp.data.auth.token)
+          LocalStorage.set(TOKEN_EXPIRED, resp.data.auth.expired)
+          resolve({
+            msg: `欢迎回来！${resp.data.userInfo.nikeName}`,
+            data: resp.data.userInfo
+          })
+        } else {
+          reject(new Error('unkown error'))
+        }
+      }, err => {
+        reject(err)
       })
     })
   }
 
   const loginOut = () => {
     loginUser.value = {
-      id: -1,
       username: '',
       password: '',
       nikeName: '',
@@ -107,7 +73,7 @@ export const useDataStore = defineStore('data', () => {
   const addUser = (user: User) => {
     return new Promise<string>((resolve, reject) => {
       if (!user.username || !user.password) {
-        reject(new Error('用户名或【密码了不能为空！'))
+        reject(new Error('用户名或密码不能为空！'))
         return
       }
 
@@ -308,8 +274,11 @@ export const useDataStore = defineStore('data', () => {
    * Getters
    */
 
-  const hasLogined = computed(() =>
-    loginUser.value.id > 0 && !!loginUser.value.username && !!loginUser.value.password)
+  const hasLogined = computed(() => {
+    const token = LocalStorage.get<string>(TOKEN)
+    const tokenExpired = LocalStorage.get<number>(TOKEN_EXPIRED)
+    return !!loginUser.value.username && !!token && !!tokenExpired && (Date.now() < tokenExpired)
+  })
 
   const getUserInfo = computed(() => loginUser.value)
 
@@ -338,7 +307,7 @@ export const useDataStore = defineStore('data', () => {
     userIdCount,
     login,
     loginOut,
-    restoreFromLocalStroage,
+    restoreUserInfo,
     addUser,
     addGroup,
     updateGroup,

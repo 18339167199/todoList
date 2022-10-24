@@ -67,5 +67,11 @@ export default defineConfig({
   server: { // 开发代理配置
     port: 8080,
     open: true,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8081/',
+        changeOrigin: true
+      }
+    }
   }
 })

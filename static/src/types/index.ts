@@ -21,7 +21,6 @@ export type Group = {
 }
 
 export type User = {
-  id: number,
   username: string,
   password: string,
   nikeName: string,

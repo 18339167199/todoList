@@ -3,11 +3,12 @@ const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
-
-const indexRouter = require('./routes/index')
-const usersRouter = require('./routes/users')
-const todosRouter = require('./routes/todos')
-const groupsRouter = require('./routes/groups')
+const session = require('express-session')
+const config = require('./config')
+const CommonResp = require('./utils/CommonResp')
+const code = require('./utils/code')
+const { expressjwt } = require('express-jwt')
+const { secretKey } = require('./utils/jwt')
 
 const app = express()
 
@@ -27,13 +28,79 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 // 静态资源文件托管
 app.use(express.static(path.join(__dirname, 'public')))
+// session
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false, //强制保存 session 即使它并没有变化,。默认为 true。建议设置成 false
+  saveUninitialized: true,
+  cookie: {
+    maxAge:2*60*60*1000 /*过期时间*/
+  },
+  rolling:true //在每次请求时重新设置 cookie，用于重置 cookie 过期时间（默认：false）
+}))
+
+
+// express Jwt 中间件
+app.use(expressjwt({
+  secret: secretKey,
+  algorithms: ['HS256']
+}).unless({
+  path: config.routes.whiteList
+}))
+
+// 登录 token 解析失败
+app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {
+    res.status(401).json(new CommonResp({
+      msg: 'Please log in',
+      code: code.C_NOT_LOGIN_ERROR
+    }))
+  }
+})
+
+
+// 请求拦截器，检查登录状态
+app.use(async function(req, res, next) {
+  console.log('req.user', req.user)
+  next()
+  return
+
+  const whiteList = config.routes.whiteList
+  const requestURL = req.url
+  const authorization = req.headers['authorization']
+
+  console.log('拦截器：')
+
+  const validation = new Promise((resolve, reject) => {
+
+    // 白名单直接放行
+    if (whiteList.includes(requestURL)) {
+      resolve()
+      return
+    }
+
+    // 判断 token 是否有效
+
+
+  })
+
+  validation.then(() => {
+    next()
+  }, err => {
+    res.json(new CommonResp({
+      code: code.FORBID,
+      msg: err.message
+    }))
+  })
+
+})
 
 
 // 路由划分
-app.use('/', indexRouter)
-app.use('/users', usersRouter)
-app.use('/todos', todosRouter)
-app.use('/groups', groupsRouter)
+app.use('/', require('./routes/index'))
+app.use('/api/user', require('./routes/user'))
+app.use('/api/todo', require('./routes/todo'))
+app.use('/api/group', require('./routes/group'))
 
 
 // catch 4r04 and forward to error handle

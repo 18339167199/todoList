@@ -57,7 +57,6 @@ import { message } from 'ant-design-vue'
 import { reactive } from 'vue'
 import { ArrowRightOutlined } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
-import globalLoading from '@/utils/globalLoading'
 import { useRouter } from 'vue-router'
 
 type FormState = {
@@ -74,13 +73,11 @@ const formState = reactive<FormState>({
   password: ''
 })
 const login = () => {
-  globalLoading.show()
   dataStore.login(formState).then(resp => {
-    globalLoading.hide()
+    console.log(resp)
     message.success(resp.msg)
     router.push('/home')
   }, err => {
-    globalLoading.hide()
     message.error(err.message)
   })
 }

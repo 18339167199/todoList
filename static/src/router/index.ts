@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useDataStore } from '@/stores/data'
+import { isTokenEffective } from '@/utils/util'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,3 +33,15 @@ const router = createRouter({
 })
 
 export default router
+
+router.beforeEach((to, form, next) => {
+  if (!to.meta.requireAuth) {
+    next()
+    return
+  }
+  if (isTokenEffective()) {
+    next()
+  } else {
+    next('/login')
+  }
+})
