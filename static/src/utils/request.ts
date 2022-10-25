@@ -1,8 +1,9 @@
 import axios from "axios"
 import type { AxiosRequestConfig, AxiosResponse, Method } from "axios"
 import globalLoading from "@/utils/globalLoading"
-import { isTokenEffective, getToken } from "./util"
+import { isTokenEffective, getToken, clearToken } from "./util"
 import { useRouter } from 'vue-router'
+import { Modal } from 'ant-design-vue'
 
 interface ApiResponse {
   code: number
@@ -29,19 +30,31 @@ const axiosInstance = axios.create({
   timeout: 5000,
 })
 
+// 请求白名单，不需要登录就能访问
+const requestWhiteList = [
+  '/user/login',
+  '/user/register'
+]
+
 axiosInstance.defaults.headers["Content-Type"] = "application/json"
 
 axiosInstance.interceptors.request.use(
   (requestConfig: AxiosRequestConfig) => {
     // 打开 loading
     requestLoadingControler.openLoading()
-    // 检查是否存在登录 token 且是否过期
+
+    // 白名单直接放行
+    if (requestWhiteList.includes(requestConfig.url as string)) {
+      return requestConfig
+    }
+
+    // 需要登录的接口加上认证 token 信息，不存在则重定向到 /login
     const token = getToken()
     if (isTokenEffective() && requestConfig.headers) {
-      requestConfig.headers["Authorization"] = token
-    } else {
-      useRouter().push('/login')
+      requestConfig.headers['authorization'] = `Bearer ${token}`
+      console.log('request: ' + requestConfig.url)
     }
+
     return requestConfig
   },
   error => {
@@ -57,6 +70,22 @@ axiosInstance.interceptors.response.use(
   },
   error => {
     requestLoadingControler.closeLoading()
+
+    // 未登录错误，提示用户进行登录
+    if (error.response.status === 401) {
+      Modal.confirm({
+        centered: true,
+        content: `登录信息已过期，请重新登录！`,
+        cancelText: '取消',
+        onOk() {
+          clearToken()
+          const router = useRouter()
+          router.push('/login')
+        }
+      })
+      return
+    }
+
     console.log('Response Error!', error)
   }
 )

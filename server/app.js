@@ -41,9 +41,35 @@ app.use(session({
 
 
 // express Jwt 中间件
+// app.use(expressjwt({
+//   secret: secretKey,
+//   algorithms: ['HS256'],
+//   getToken: function(req) {
+//     const auth = req.headers.authorization
+//     const authSplitArr = auth.split(' ')
+//     if (auth && authSplitArr.length === 2) {
+//       return authSplitArr[1]
+//     }
+
+//     console.log('on expressjwt auth', auth)
+//     return ''
+//   }
+// }).unless({
+//   path: config.routes.whiteList
+// }))
+
 app.use(expressjwt({
   secret: secretKey,
-  algorithms: ['HS256']
+  requestProperty: 'auth',
+  algorithms: ['HS256'],
+  getToken: function fromHeaderOrQuerystring (req) {
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+      return req.headers.authorization.split(' ')[1]
+    } else if (req.query && req.query.token) {
+      return req.query.token
+    }
+    return null
+  }
 }).unless({
   path: config.routes.whiteList
 }))
@@ -59,9 +85,9 @@ app.use(function (err, req, res, next) {
 })
 
 
-// 请求拦截器，检查登录状态
+// 请求拦截器，token 
 app.use(async function(req, res, next) {
-  console.log('req.user', req.user)
+  console.log('req.auth', req.auth)
   next()
   return
 

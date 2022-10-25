@@ -5,8 +5,10 @@ const CommonResp = require('../utils/CommonResp')
 const code = require('../utils/code')
 const userRoute = express.Router()
 
-userRoute.get('/', function(req, res, next) {
-  res.send('respond with a resource')
+// 获取用户信息
+userRoute.get('/', function(request, respond, next) {
+  const user = request.user
+  respond.json('ok')
 })
 
 // 用户注册
@@ -75,13 +77,6 @@ userRoute.post('/login', async (request, respond, next) => {
   }
 
   console.log(`${username} login`)
-})
-
-// 获取用户信息
-userRoute.get('/get', async (request, respond, next) => {
-  const user = request.user
-
-  respond.json('ok')
 })
 
 // 未登录错误
