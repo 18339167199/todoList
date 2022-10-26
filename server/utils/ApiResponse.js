@@ -1,8 +1,8 @@
-class CommonResp {
+class ApiResponse {
 
     constructor({ code, data, msg }) {
         this.code = code
-        this.data = data || null
+        this.data = (data != null && data != undefined) ? data : null
         this.msg = msg || ''
     }
 
@@ -27,6 +27,10 @@ class CommonResp {
         return this.data
     }
 
+    static c(code, msg, data) {
+        return new ApiResponse({ code, msg, data })
+    }
+
 }
 
-module.exports = CommonResp
+module.exports = ApiResponse

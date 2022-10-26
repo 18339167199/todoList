@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const session = require('express-session')
 const config = require('./config')
-const CommonResp = require('./utils/CommonResp')
+const ApiResponse = require('./utils/ApiResponse')
 const code = require('./utils/code')
 const { expressjwt } = require('express-jwt')
 const { secretKey } = require('./utils/jwt')
@@ -39,25 +39,7 @@ app.use(session({
   rolling:true //在每次请求时重新设置 cookie，用于重置 cookie 过期时间（默认：false）
 }))
 
-
-// express Jwt 中间件
-// app.use(expressjwt({
-//   secret: secretKey,
-//   algorithms: ['HS256'],
-//   getToken: function(req) {
-//     const auth = req.headers.authorization
-//     const authSplitArr = auth.split(' ')
-//     if (auth && authSplitArr.length === 2) {
-//       return authSplitArr[1]
-//     }
-
-//     console.log('on expressjwt auth', auth)
-//     return ''
-//   }
-// }).unless({
-//   path: config.routes.whiteList
-// }))
-
+// express jwt 中间件解析请求携带的 token
 app.use(expressjwt({
   secret: secretKey,
   requestProperty: 'auth',
@@ -77,48 +59,11 @@ app.use(expressjwt({
 // 登录 token 解析失败
 app.use(function (err, req, res, next) {
   if (err.name === 'UnauthorizedError') {
-    res.status(401).json(new CommonResp({
+    res.status(401).json(new ApiResponse({
       msg: 'Please log in',
       code: code.C_NOT_LOGIN_ERROR
     }))
   }
-})
-
-
-// 请求拦截器，token 
-app.use(async function(req, res, next) {
-  console.log('req.auth', req.auth)
-  next()
-  return
-
-  const whiteList = config.routes.whiteList
-  const requestURL = req.url
-  const authorization = req.headers['authorization']
-
-  console.log('拦截器：')
-
-  const validation = new Promise((resolve, reject) => {
-
-    // 白名单直接放行
-    if (whiteList.includes(requestURL)) {
-      resolve()
-      return
-    }
-
-    // 判断 token 是否有效
-
-
-  })
-
-  validation.then(() => {
-    next()
-  }, err => {
-    res.json(new CommonResp({
-      code: code.FORBID,
-      msg: err.message
-    }))
-  })
-
 })
 
 
@@ -129,7 +74,7 @@ app.use('/api/todo', require('./routes/todo'))
 app.use('/api/group', require('./routes/group'))
 
 
-// catch 4r04 and forward to error handle
+// catch 404 and forward to error handle
 app.use(function(req, res, next) {
   next(createError(404))
 })

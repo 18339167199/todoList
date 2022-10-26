@@ -9,8 +9,7 @@ module.exports = {
       {
         username: user.username,
         email: user.email,
-        id: user._id.toString(),
-        expired: Date.now() + tokenExpiredTime*24*60*60*1000
+        id: user._id.toString()
       },
       secretKey,
       {

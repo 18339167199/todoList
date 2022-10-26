@@ -1,13 +1,22 @@
 const mongoose = require('mongoose')
+const { getCurrentDateStr } = require('../utils/date')
 
 const GroupSchema = new mongoose.Schema({
-    id: { type: Number, require: true },
-    userId: { type: Number, require: true },
-    count: { type: Number, default: 0 },                       
+    userId: String,
+    count: {
+        type: Number,
+        default: 0
+    },                       
     gname: String,
     descr: String,
-    createTime: String,
-    updateTime: String
+    createTime: {
+        type: String,
+        default: ''
+    },
+    updateTime: {
+        type: String,
+        default: ''
+    }
 })
 
 module.exports = mongoose.model('Group', GroupSchema)

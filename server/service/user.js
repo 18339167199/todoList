@@ -3,77 +3,55 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 class UserService {
 
-    /**
-     * 按 username 和 password 查找用户, 当 password 不传或者为空时按 username 查找
-     * @param {string} username
-     * @param {string} password
-     * @returns User
-     */
-    static getByUsernameAndPassword = (username, password) => new Promise(async (resolve, reject) => {
-        if (!username) {
-            reject(new Error('username 不能为空！'))
-            return
-        }
+  /**
+   * 按 username 和 password 查找用户, 当 password 不传或者为空时按 username 查找
+   * @param {string} username
+   * @param {string} password
+   * @returns User
+   */
+  static getByUsernameAndPassword(username, password) {
+    if (!username) {
+      return Promise.reject(new Error('username cannot be empty!'))
+    }
 
-        const queryParams = { username }
-        if (password) {
-            queryParams.password = password
-        }
+    const queryParams = { username }
+    if (password) {
+      queryParams.password = password
+    }
 
-        try {
-            const user = await UserModel.findOne(queryParams)
-            resolve(user)
-        } catch (err) {
-            reject(err)
-        }
-    })
+    return UserModel.findOne(queryParams)
+  }
 
-    /**
-     * 按 id 查找用户
-     * @param {number} id 
-     * @returns User 
-     */
-    static getById = (id) => new Promise(async (resolve, reject) => {
-        if (!id) {
-            reject(new Error('id 不能为空！'))
-            return
-        }
+  /**
+   * 按 id 查找用户
+   * @param {number} id 
+   * @returns User 
+   */
+  static getById(id) {
+    if (!id) {
+      return Promise.reject(new Error('id cannot be empty!'))
+    }
+    return UserModel.findOne({ _id: ObjectId(id) })
+  }
 
-        try {
-            const user = await UserModel.findOne({ _id: ObjectId(id) })
-            resolve(user)
-        } catch (err) {
-            reject(err)
-        }
-    })
+  /**
+   * 新增用户
+   * @param {User} user 
+   * @returns 
+   */
+  static async add(user) {
+    const { username, password } = user
+    if (!username || !password) {
+      return Promise.reject(new Error('Required fields not complete!'))
+    }
 
-    /**
-     * 新增用户
-     * @param {User} user 
-     * @returns 
-     */
-    static add = (user) => new Promise(async (resolve, reject) => {
-        const { username, password } = user
+    const queryDBUser = await this.getByUsernameAndPassword(user.username)
+    if (queryDBUser) {
+      return Promise.reject(new Error('The same username already exists, please change the username!'))
+    }
 
-        if (!username || !password) {
-            reject(new Error('Required fields not complete!'))
-            return
-        }
-
-        const queryDBUser = await this.getByUsernameAndPassword(user.username)
-        if (queryDBUser) {
-            reject(new Error('The same username already exists, please change the username!'))
-            return
-        }
-
-        try {
-            await new UserModel(user).save()
-            resolve(true)
-        } catch (err) {
-            reject(err)
-        }
-    })
-
+    return new UserModel(user).save()
+  }
 }
 
 module.exports = UserService
