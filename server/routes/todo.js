@@ -1,11 +1,17 @@
 const express = require('express')
-const router = express.Router()
-const path = require('path')
+const todoRouter = express.Router()
 
-router.get('/', (req, res, next) => {
-  res.render('404', {
-    targer: req.originalUrl
-  })
+// 获取指定 groupId 下的所有 todo
+todoRouter.get('/group/:groupId', (request, response, next) => {
+  const groupId = request.params.groupId  
 })
 
-module.exports = router
+// 新增 todo
+
+// 查询 todo
+
+// 更新 todo
+
+// 删除 tood
+
+module.exports = todoRouter
