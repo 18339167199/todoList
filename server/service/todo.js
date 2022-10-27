@@ -2,8 +2,13 @@ const TodoModel = require('../models/todo')
 
 class TodoService {
 
-  // static findBy
+  /**
+   * 按 groupId 查找 todo
+   * @param {number} groupId
+   * @returns 
+   */
+  static findByGroupId = (groupId) => TodoModel.find({ groupId })
 
 }
 
-module.exports = TodoModel
+module.exports = TodoService

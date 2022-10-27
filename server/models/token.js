@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 
 const TokenSchema = new mongoose.Schema({
-  userId: { type: String, require: true },
-  token: { type: String, default: '' },
-  expired: { type: Date, require: true }
+  userId: String,
+  token: String,
+  expired: String
 })
 
 TokenSchema.virtual('isExpired').get(function() {

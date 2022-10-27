@@ -1,13 +1,24 @@
 const mongoose = require('mongoose')
 
 const TodoSchema = new mongoose.Schema({
-    id: { type: Number, require: true },
-    groupId: { type: Number, require: true },
-    done: Number,
-    star: Number,
+    groupId: String,
+    done: {
+        type: Number,
+        default: 0
+    },
+    star: {
+        type: Number,
+        default: 0
+    },
     content: String,
-    note: String,
-    createTime: String,
+    note: {
+        type: String,
+        default: ''
+    },
+    createTime: {
+        type: String,
+        default: ``
+    },
     updateTime: String,
     scheduledTime: String
 })

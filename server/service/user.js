@@ -1,4 +1,5 @@
 const UserModel = require('../models/user')
+const { getCurrentDateStr } = require('../utils/date')
 const ObjectId = require('mongoose').Types.ObjectId
 
 class UserService {
@@ -50,7 +51,15 @@ class UserService {
       return Promise.reject(new Error('The same username already exists, please change the username!'))
     }
 
-    return new UserModel(user).save()
+    const createUser = {
+      username: user.username,
+      password: user.password,
+      email: user.email || '',
+      nikeName: user.nikeName || 'Todo',
+      createTime: getCurrentDateStr()
+    }
+
+    return new UserModel(createUser).save()
   }
 }
 

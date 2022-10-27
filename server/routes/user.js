@@ -20,7 +20,7 @@ userRoute.post('/', async (request, response, next) => {
     const resp = await UserService.add(user)
     response.json(c(code.SUCCESS, 'ok!', resp))
   } catch (err) {
-    response.json(c(code.FAILED, 'Registration failed!'))
+    response.json(c(code.FAILED, err.message))
   }
 })
 
