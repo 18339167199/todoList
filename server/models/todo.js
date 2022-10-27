@@ -17,10 +17,13 @@ const TodoSchema = new mongoose.Schema({
     },
     createTime: {
         type: String,
-        default: ``
+        default: ''
     },
     updateTime: String,
-    scheduledTime: String
+    scheduledTime: {
+        type: String,
+        default: ''
+    }
 })
 
 TodoSchema.virtual('expried').get(function() {
@@ -34,4 +37,3 @@ TodoSchema.virtual('expried').get(function() {
 })
 
 module.exports = mongoose.model('Todo', TodoSchema)
-

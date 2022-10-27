@@ -3,7 +3,6 @@ const GroupService = require('../service/group')
 const code = require('../utils/code')
 const { c } = require('../utils/ApiResponse')
 const groupRouter = express.Router()
-const ObjectId = require('mongoose').Types.ObjectId
 
 // 获取用户的所有分组
 groupRouter.get('/', async (request, response, next) => {
@@ -48,11 +47,7 @@ groupRouter.put('/', async (request, response, next) => {
   try {
     const group = request.body
     const { modifiedCount } = await GroupService.update(group)
-    if (modifiedCount > 0) {
-      response.json(c(code.SUCCESS, 'ok!', modifiedCount))
-    } else {
-      response.json(c(code.FAILED, 'group not found!'))
-    }
+    response.json(c(code.SUCCESS, 'ok!', modifiedCount))
   } catch (err) {
     response.json(c(code.FAILED, err.message))
   }

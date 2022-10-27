@@ -49,14 +49,12 @@ class GroupService {
       return Promise.reject(new Error('groupId cannot be empty!'))
     }
 
-    return GroupModel.updateOne(
-      { _id: ObjectId(groupId) },
-      {
-        gname: group.gname,
-        descr: group.descr,
-        updateTime: getCurrentDateStr()
-      }
-    )
+    const updateGroupParams = {}
+    Object.keys(group).filter(key => key !== 'id').forEach(key => {
+      updateGroupParams[key] = group[key]
+    })
+
+    return GroupModel.updateOne({ _id: ObjectId(groupId) }, updateGroupParams)
   }
 
 }

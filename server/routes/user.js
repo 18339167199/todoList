@@ -28,7 +28,7 @@ userRoute.post('/', async (request, response, next) => {
 userRoute.post('/login', async (request, response, next) => {
   const { username, password } = request.body
   if (!username || !password) {
-    response.josn(c(code.FAILED, 'username and password cannot be empty'))
+    response.json(c(code.FAILED, 'username and password cannot be empty'))
     return
   }
 
