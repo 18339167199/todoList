@@ -27,7 +27,17 @@ userRoute.post('/', async (request, response, next) => {
   try {
     const user = request.body
     const resp = await UserService.add(user)
-    response.json(c(code.SUCCESS, 'ok!', resp))
+    response.json(c(
+      code.SUCCESS,
+      'ok!',
+      {
+        username: resp.username,
+        nikeName: resp.nikeName,
+        email: resp.email,
+        createTime: resp.createTime,
+        updateTime: resp.updateTime
+      }
+    ))
   } catch (err) {
     response.json(c(code.FAILED, err.message))
   }
