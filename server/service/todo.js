@@ -8,7 +8,6 @@ class TodoService {
   /**
    * 按 groupId 查找 todo
    * @param {number} groupId
-   * @returns 
    */
   static findByGroupId = (groupId) => TodoModel.find({ groupId })
 
@@ -20,8 +19,7 @@ class TodoService {
 
   /**
    * 新增 todo
-   * @param {Todo} todo 
-   * @returns 
+   * @param {Todo} todo
    */
   static async add(todo) {
     if (!todo.content) {
@@ -40,8 +38,7 @@ class TodoService {
 
   /**
    * 更新 todo
-   * @param {Todo} todo 
-   * @returns 
+   * @param {Todo} todo
    */
   static update(todo) {
     const todoId = todo.id
@@ -60,8 +57,7 @@ class TodoService {
 
   /**
    * 删除 todo
-   * @param {number} todoId 
-   * @returns 
+   * @param {number} todoId
    */
   static async del(todoId) {
     if (!todoId) {
@@ -81,6 +77,7 @@ class TodoService {
 
     return TodoModel.deleteOne({ _id: ObjectId(todoId) })
   }
+
 }
 
 module.exports = TodoService

@@ -10,7 +10,7 @@ class UserService {
    * @param {string} password
    * @returns User
    */
-  static getByUsernameAndPassword(username, password) {
+  static findByUsernameAndPassword(username, password) {
     if (!username) {
       return Promise.reject(new Error('username cannot be empty!'))
     }
@@ -28,7 +28,7 @@ class UserService {
    * @param {number} id 
    * @returns User 
    */
-  static getById(id) {
+  static findById(id) {
     if (!id) {
       return Promise.reject(new Error('id cannot be empty!'))
     }
@@ -46,7 +46,7 @@ class UserService {
       return Promise.reject(new Error('Required fields not complete!'))
     }
 
-    const queryDBUser = await this.getByUsernameAndPassword(user.username)
+    const queryDBUser = await this.findByUsernameAndPassword(user.username)
     if (queryDBUser) {
       return Promise.reject(new Error('The same username already exists, please change the username!'))
     }
@@ -61,6 +61,7 @@ class UserService {
 
     return new UserModel(createUser).save()
   }
+
 }
 
 module.exports = UserService

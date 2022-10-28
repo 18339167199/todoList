@@ -5,7 +5,7 @@ const { getCurrentDateStr } = require('../utils/date')
 class GroupService {
 
   /***
-   * @param id id
+   * @param {number} id
    */
   static findById = (id) => GroupModel.findById(id)
 
@@ -13,8 +13,7 @@ class GroupService {
 
   /**
    * 新增分组
-   * @param {Group} group 
-   * @returns 
+   * @param {Group} group
    */
   static add(group) {
     if (!group.gname) {
@@ -40,8 +39,7 @@ class GroupService {
 
   /**
    * 更新 group
-   * @param {Group} group 
-   * @returns 
+   * @param {Group} group
    */
   static update(group) {
     const groupId = group.id

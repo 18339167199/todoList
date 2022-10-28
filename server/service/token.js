@@ -8,6 +8,10 @@ const getDateAfterDay = (day) => {
 
 class TokenService {
 
+  /**
+   * 创建认证 token
+   * @param {User} user
+   */
   static createToken = (user) => new Promise(async (resolve, reject) => {
     const token = jwtUtil.createToken(user)
     const isTokenExsit = await TokenModel.findOne({ userId: user._id.toString() })
@@ -28,6 +32,11 @@ class TokenService {
     }
   })
 
+  /**
+   * 添加 token
+   * @param {number} userId
+   * @param {string} token
+   */
   static add = (userId, token) => new Promise(async (resolve, reject) => {
     const tokenItem = await TokenModel.findOne({ userId })
     if (tokenItem) {
@@ -48,6 +57,11 @@ class TokenService {
     })
   })
 
+  /**
+   * 更新 token
+   * @param {*} userId
+   * @param {*} token
+   */
   static update = (userId, token) => new Promise(async (resolve, reject) => {
     try {
       const updateResult = await TokenModel.updateOne(

@@ -6,11 +6,20 @@ const code = require('../utils/code')
 const userRoute = express.Router()
 
 // 获取用户信息
-userRoute.get('/', function(request, response, next) {
-  const userId = request.user.id
-
-
-  response.json('ok')
+userRoute.get('/', async (request, response, next) => {
+  try {
+    const userId = request.auth.id
+    const resp = await UserService.findById(userId)
+    response.json(c(code.SUCCESS, 'ok!', {
+      username: resp.username,
+      nikeName: resp.nikeName,
+      email: resp.email,
+      createTime: resp.createTime,
+      updateTime: resp.updateTime
+    }))
+  } catch (err) {
+    response.json(c(code.FORBID, 'user is not login.'))
+  }
 })
 
 // 用户注册
@@ -33,7 +42,7 @@ userRoute.post('/login', async (request, response, next) => {
   }
 
   try {
-    const user = await UserService.getByUsernameAndPassword(username, password)
+    const user = await UserService.findByUsernameAndPassword(username, password)
     if (!user) {
       response.json(c(code.FAILED, 'username or password are incorrect!'))
       return
@@ -53,11 +62,6 @@ userRoute.post('/login', async (request, response, next) => {
     console.log('login error!', err)
     response.json(c(code.S_UNKOWN_ERROR, 'server error!'))
   }
-})
-
-// 未登录错误
-userRoute.get('/error', (request, response) => {
-  response.json(c(code.FAILED, 'unauthorized'))
 })
 
 module.exports = userRoute

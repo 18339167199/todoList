@@ -1,3 +1,6 @@
+/**
+ * 数据返回 code 定义
+ */
 const code = {
 
     SUCCESS: 0, // 成功

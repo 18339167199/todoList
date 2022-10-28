@@ -1,3 +1,6 @@
+/**
+ * 定义通用的数据返回
+ */
 class ApiResponse {
 
     constructor({ code, data, msg }) {
