@@ -53,8 +53,7 @@ class TodoService {
     Object.keys(todo).filter(key => key !== 'id').forEach(key => {
       updateTodoParams[key] = todo[key]
     })
-
-    console.log('update todo params', updateTodoParams)
+    updateTodoParams.updateTime = getCurrentDateStr()
 
     return TodoModel.updateOne({ _id: ObjectId(todoId) }, updateTodoParams)
   }
@@ -79,8 +78,6 @@ class TodoService {
       id: groupId,
       $inc: { count: -1 } // count --
     })
-    
-    console.log('delete todo update group', group)
 
     return TodoModel.deleteOne({ _id: ObjectId(todoId) })
   }

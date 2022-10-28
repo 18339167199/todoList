@@ -2,10 +2,10 @@ const express = require('express')
 const GroupService = require('../service/group')
 const code = require('../utils/code')
 const { c } = require('../utils/ApiResponse')
-const groupRouter = express.Router()
+const groupRoute = express.Router()
 
 // 获取用户的所有分组
-groupRouter.get('/', async (request, response, next) => {
+groupRoute.get('/', async (request, response, next) => {
   try {
     const userId = request.auth.id
     const groups = await GroupService.findByUserId(userId)
@@ -18,7 +18,7 @@ groupRouter.get('/', async (request, response, next) => {
 })
 
 // 查询分组
-groupRouter.get('/:id', async (request, response, next) => {
+groupRoute.get('/:id', async (request, response, next) => {
   try {
     const group = await GroupService.findById(request.params.id)
     response.json(c(code.SUCCESS, 'ok', group))
@@ -28,7 +28,7 @@ groupRouter.get('/:id', async (request, response, next) => {
 })
 
 // 新增分组
-groupRouter.post('/', async (request, response, next) => {
+groupRoute.post('/', async (request, response, next) => {
   try {
     const user = request.auth
     const resp = await GroupService.add({
@@ -43,7 +43,7 @@ groupRouter.post('/', async (request, response, next) => {
 })
 
 // 更新分组
-groupRouter.put('/', async (request, response, next) => {
+groupRoute.put('/', async (request, response, next) => {
   try {
     const group = request.body
     const { modifiedCount } = await GroupService.update(group)
@@ -54,7 +54,7 @@ groupRouter.put('/', async (request, response, next) => {
 })
 
 // 删除分组
-groupRouter.delete('/:id', async (request, response, next) => {
+groupRoute.delete('/:id', async (request, response, next) => {
   try {
     const ids = request.params.id.split(',')
     const resp = await GroupService.del(ids)
@@ -64,4 +64,4 @@ groupRouter.delete('/:id', async (request, response, next) => {
   }
 })
 
-module.exports = groupRouter
+module.exports = groupRoute
