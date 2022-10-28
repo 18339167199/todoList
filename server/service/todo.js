@@ -18,22 +18,27 @@ class TodoService {
   static findById = (id) => TodoModel.findById(id)
 
   /**
+   * 按关键字模糊查询 todo
+   * @param {string} keyword
+   */
+  static findByKeyword = (keyword) => TodoModel.find({ content: new RegExp(keyword, 'i') })
+
+  /**
    * 新增 todo
    * @param {Todo} todo
    */
   static async add(todo) {
-    if (!todo.content) {
-      return Promise.reject(new Error('content cannot be empty!'))
+    try {
+      const groupId = todo.groupId
+      const { modifiedCount } = await GroupService.update({ id: groupId, $inc: { count: 1 } })
+      if (modifiedCount === 0) {
+        throw new Error('group not found!')
+      }
+      todo.createTime = getCurrentDateStr()
+      return new TodoModel(todo).save()
+    } catch (err) {
+      return Promise.reject(err)
     }
-
-    const groupId = todo.groupId
-    const group = await GroupService.update({
-      id: groupId,
-      $inc: { count: 1 } // count ++
-    })
-
-    todo.createTime = getCurrentDateStr()
-    return new TodoModel(todo).save()
   }
 
   /**
@@ -51,7 +56,6 @@ class TodoService {
       updateTodoParams[key] = todo[key]
     })
     updateTodoParams.updateTime = getCurrentDateStr()
-
     return TodoModel.updateOne({ _id: ObjectId(todoId) }, updateTodoParams)
   }
 
@@ -60,22 +64,33 @@ class TodoService {
    * @param {number} todoId
    */
   static async del(todoId) {
-    if (!todoId) {
-      return Promise.reject(new Error('todoId cannot be empty!'))
+    try {
+      const todo = await this.findById(todoId)
+      await GroupService.update({ id: todo.groupId, $inc: { count: -1 } })
+      return TodoModel.deleteOne({ _id: ObjectId(todoId) })
+    } catch (err) {
+      return Promise.reject(err)
     }
+  }
 
-    const todo = await this.findById(todoId)
-    if (!todo) {
-      return Promise.reject(new Error('todo not found!'))
+  /**
+   * 将 todo 移动到另一个分组
+   * @param {number} todoId
+   * @param {number} groupId
+   */
+  static async move(todoId, groupId) {
+    try {
+      const todo = await this.findById(todoId)
+      await GroupService.update({ id: todo.groupId, $inc: { count: -1 } })
+      const afterGroup = await GroupService.update({ id: groupId, $inc: { count: 1 } })
+      if (afterGroup.modifiedCount === 0) {
+        GroupService.update({ id: todo.groupId, $inc: { count: 1 } })
+        throw new Error('group not found!')
+      }
+      return this.update({ id: todoId, groupId })
+    } catch (err) {
+      Promise.reject(err)
     }
-
-    const groupId = todo.groupId
-    const group = await GroupService.update({
-      id: groupId,
-      $inc: { count: -1 } // count --
-    })
-
-    return TodoModel.deleteOne({ _id: ObjectId(todoId) })
   }
 
 }

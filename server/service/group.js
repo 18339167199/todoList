@@ -5,10 +5,15 @@ const { getCurrentDateStr } = require('../utils/date')
 class GroupService {
 
   /***
+   * 按分组 id 查询分组
    * @param {number} id
    */
   static findById = (id) => GroupModel.findById(id)
 
+  /**
+   * 按用户 id 查询分组
+   * @param {number} userId
+   */
   static findByUserId = (userId) => GroupModel.find({ userId })
 
   /**

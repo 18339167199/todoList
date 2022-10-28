@@ -1,4 +1,5 @@
 const express = require('express')
+const todo = require('../models/todo')
 const TodoService = require('../service/todo')
 const { c } = require('../utils/ApiResponse')
 const code = require('../utils/code')
@@ -20,6 +21,17 @@ todoRoute.get('/:id', async (request, response, next) => {
   try {
     const id = request.params.id
     const resp = await TodoService.findById(id)
+    response.json(c(code.SUCCESS, 'ok!', resp))
+  } catch (err) {
+    response.json(c(code.FAILED, err.message))
+  }
+})
+
+// 模糊查询所有的 todo
+todoRoute.get('/search/:keyword', async (request, response, next) => {
+  try {
+    const keyword = request.params.keyword
+    const resp = await TodoService.findByKeyword(keyword)
     response.json(c(code.SUCCESS, 'ok!', resp))
   } catch (err) {
     response.json(c(code.FAILED, err.message))
@@ -55,7 +67,22 @@ todoRoute.delete('/:id', async (request, response, next) => {
     const resp = await TodoService.del(id)
     response.json(c(code.SUCCESS, 'ok!', resp))
   } catch (err) {
-    response.json(c(code.FAILED, 'ok!'))
+    console.log(err)
+    response.json(c(code.FAILED, 'todo not found'))
+  }
+})
+
+// 移动 todo 到其他的分组
+todoRoute.get('/move/:todoId/:groupId', async (request, response, enxt) => {
+  try {
+    const { todoId, groupId } = request.params
+    const {  modifiedCount } = await TodoService.move(todoId, groupId)
+    if(modifiedCount === 0) {
+      throw new Error('Parameter error!')
+    }
+    response.json(c(code.SUCCESS, 'ok!', resp))
+  } catch (err) {
+    response.json(c(code.FAILED, err.message))
   }
 })
 
