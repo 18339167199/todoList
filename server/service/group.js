@@ -1,4 +1,5 @@
 const GroupModel = require('../models/group')
+const TodoModel = require('../models/todo')
 const ObjectId = require('mongoose').Types.ObjectId
 const { getCurrentDateStr } = require('../utils/date')
 
@@ -32,13 +33,17 @@ class GroupService {
    * 根据 ids 删除 group，支持批量删除
    * @param {number[]} ids
    */
-  static del(ids) {
+  static async del(ids) {
     if (!ids || ids.length === 0) {
       return Promise.reject(new Error('id cannot be empty!'))
-    } else if (ids.length === 1) {
-      return GroupModel.remove({ _id: ObjectId(ids[0]) })
-    } else {
-      return GroupModel.remove({ _id: { $in: ids } })
+    }
+
+    try {
+      await TodoModel.deleteMany({ groupId: { $in: ids } })
+      await GroupModel.deleteMany({ _id: { $in: ids } })
+      return true
+    } catch (err) {
+      return Promise.reject(err)
     }
   }
 

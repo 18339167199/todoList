@@ -3,9 +3,13 @@ import { defineStore } from 'pinia'
 import type { Todo, Group, User } from '@/types'
 import LocalStorage from '@/utils/localStroage'
 import { getCurrentDateStr } from '@/utils/util'
-
-import { loginApi, getUserInfoApi } from '@/api/user'
+import { clearToken } from '@/utils/util'
 import { TOKEN, TOKEN_EXPIRED } from '@/utils/constant'
+import { setToken } from '@/utils/util'
+
+// api
+import { loginApi, getUserInfoApi } from '@/api/user'
+import { getGroupApi, addGroupApi, updateGroupApi, deleteGroupApi } from '@/api/group'
 
 export const useDataStore = defineStore('data', () => {
   const todos = reactive<Todo[]>([])
@@ -45,14 +49,13 @@ export const useDataStore = defineStore('data', () => {
       loginApi(data).then(resp => {
         if (resp.code === 0) {
           loginUser.value = resp.data.userInfo
-          LocalStorage.set(TOKEN, resp.data.auth.token)
-          LocalStorage.set(TOKEN_EXPIRED, resp.data.auth.expired)
+          setToken(resp.data.auth.token, resp.data.auth.expired)
           resolve({
             msg: `欢迎回来！${resp.data.userInfo.nikeName}`,
             data: resp.data.userInfo
           })
         } else {
-          reject(new Error('unkown error'))
+          reject(new Error(resp.msg))
         }
       }, err => {
         reject(err)
@@ -61,6 +64,7 @@ export const useDataStore = defineStore('data', () => {
   }
 
   const loginOut = () => {
+    clearToken()
     loginUser.value = {
       username: '',
       password: '',
@@ -160,45 +164,46 @@ export const useDataStore = defineStore('data', () => {
   }
 
   // group
-  const getGroupById = (id: number) => groups.find(group => group.id === id)
-  const addGroup = (group: Group) => {
-    group.id = ++groupIdCount.value
-    if (group.userId > 0) {
-      groups.push(group)
+  const fetchGroup = async () => {
+    const resp = await getGroupApi()
+    if (resp.code === 0) {
+      groups.splice(0, groups.length)
+      groups.push(...resp.data)
       return true
     }
+
     return false
   }
-  const updateGroup= ({ id, gname, descr }: { id: number, gname: string, descr: string }) => {
-    const group = getGroupById(id)
-    if (!group) {
+  const getGroupById = async (id: string) => groups.find(group => group.id === id)
+  const addGroup = async (group: { gname: string, descr: string }) => {
+    try {
+      const { code } = await addGroupApi(group)
+      return code === 0
+    } catch (err) {
       return false
+    } finally {
+      fetchGroup()
     }
-    group.gname = gname
-    group.descr = descr
-    group.updateTime = getCurrentDateStr()
-    return true
   }
-  const deleteGroup = (id: number) => {
-    const group = getGroupById(id)
-    if (!group) {
+  const updateGroup= async (group: { id: string, gname: string, descr: string }) => {
+    try {
+      const { code } = await updateGroupApi(group)
+      return code === 0
+    } catch (err) {
       return false
+    } finally {
+      fetchGroup()
     }
-    // 将分组下的 todo 删除
-    const needDeleteTodos = todos.filter(todo => todo.groupId === id)
-    for (let i = 0; i < needDeleteTodos.length; i++) {
-      todos.splice(todos.indexOf(needDeleteTodos[i]), 1)
-    }
-    groups.splice(groups.indexOf(group), 1)
-    return true
   }
-  const deleteGroupByIds = (ids: number[]) => {
-    const isIdsAllExist = ids.every(id => !!getGroupById(id))
-    if (!isIdsAllExist) {
+  const deleteGroupByIds = async (ids: string[]) => {
+    try {
+      const { code } = await deleteGroupApi(ids)
+      return code === 0
+    } catch (err) {
       return false
+    } finally {
+      fetchGroup()
     }
-    ids.forEach(id => { deleteGroup(id) })
-    return true
   }
 
   // todo
@@ -284,7 +289,7 @@ export const useDataStore = defineStore('data', () => {
 
   // group
   const getGroups = computed(() => groups.filter(group => group.userId === loginUser.value.id))
-  const getGroupNameById = computed(() => (id: number) => {
+  const getGroupNameById = computed(() => (id: string) => {
     const group = groups.find(group => group.id === id)
     if (!group) {
       return ''
@@ -309,9 +314,9 @@ export const useDataStore = defineStore('data', () => {
     loginOut,
     restoreUserInfo,
     addUser,
+    fetchGroup,
     addGroup,
     updateGroup,
-    deleteGroup,
     deleteGroupByIds,
     getTodoById,
     addTodo,

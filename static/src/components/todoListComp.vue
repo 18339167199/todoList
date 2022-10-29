@@ -217,7 +217,7 @@ import { Modal, message } from 'ant-design-vue'
 import bus from '@/utils/bus'
 
 const props = defineProps<{
-  groupId: number,
+  groupId: string,
   searchMode: boolean
 }>()
 
@@ -236,8 +236,8 @@ const data = reactive<{
   modalVisible: false,
   selectedGroupKeys: [],
   curTodo: {
-    id: -1,
-    groupId: -1,
+    id: '',
+    groupId: '',
     done: 0,
     star: 0,
     content: '',
@@ -260,8 +260,8 @@ const openDrawer = (todo: Todo) => {
 }
 const resetCurTodo = () => {
   data.curTodo = {
-    id: -1,
-    groupId: -1,
+    id: '',
+    groupId: '',
     done: 0,
     star: 0,
     content: '',
@@ -316,7 +316,7 @@ const updateTodoStatus = (type: 'done' | 'star', value: 0 | 1) => {
 const iscurTodoChange = () => {
   const originTodo = dataStore.getTodoById(data.curTodo.id)
   const curTodo = data.curTodo
-  if (!originTodo || curTodo.id === -1) {
+  if (!originTodo || curTodo.id === '') {
     return false
   }
   return originTodo.content !== curTodo.content ||
@@ -348,7 +348,7 @@ const tableData = computed(() => dataStore.getGroups
   .map(group => ({ key: group.id, ...group}))
 )
 const moveToGroup = () => {
-  if (data.curTodo.id < 0 || data.selectedGroupKeys.length === 0) {
+  if (data.curTodo.id === '' || data.selectedGroupKeys.length === 0) {
     message.warn('请选择一个分组！')
     return
   }

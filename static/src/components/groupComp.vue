@@ -69,8 +69,8 @@ const onDelete = () => {
     content: `分组中的待办将一起删除，确定要删除分组“${props.data.gname}”吗？`,
     icon: createVNode(ExclamationCircleOutlined),
     cancelText: '取消',
-    onOk() {
-      const result = dataStore.deleteGroup(props.data.id)
+    async onOk() {
+      const result = await dataStore.deleteGroupByIds([props.data.id])
       if (result) {
         message.success('删除成功！')
       } else {

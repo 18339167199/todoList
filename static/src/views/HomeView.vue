@@ -240,7 +240,6 @@ import {
   BgColorsOutlined
 } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
-import { getCurrentDateStr } from '@/utils/util'
 import type { Group } from '@/types'
 import { DRAWER_TYPE } from '@/utils/util'
 import LocalStorage from '@/utils/localStroage'
@@ -254,14 +253,14 @@ const data = reactive({
   searchKeyWord: '',
   searchMode: false,
   curSearchKeyWord: '',
-  selectedGroupId: -1,
+  selectedGroupId: '',
   drawerVisible: false,
   drawerType: DRAWER_TYPE.ADD_GROUP,
   drawerBtnLoading: false,
   deleteGroupIds: [],
   themeNumber: LocalStorage.get<number>('themeNumber') || 1,
   createGroupForm: {
-    id: -1,
+    id: '',
     gname: '',
     descr: '',
   },
@@ -279,11 +278,11 @@ const onSearch = () => {
     data.curSearchKeyWord = data.searchKeyWord
     bus.emit('passKeyWord', data.searchKeyWord)
     data.searchMode = true
-    data.selectedGroupId = -1
+    data.selectedGroupId = ''
   }, 500)
 }
-const selectGroup = (groupId: number) => {
-  if (groupId && groupId > 0) {
+const selectGroup = (groupId: string) => {
+  if (groupId) {
     data.selectedGroupId = groupId
   }
 }
@@ -298,52 +297,45 @@ const openDrawer = (type: DRAWER_TYPE, group?: Group) => {
 }
 const resetDrawerContent = (visible: boolean) => {
   if (!visible) {
-    data.createGroupForm.id = -1
+    data.createGroupForm.id = ''
     data.createGroupForm.gname = ''
     data.createGroupForm.descr = ''
     data.deleteGroupIds = []
   }
 }
-const createGroup = () => {
-  let result = false
+const createGroup = async () => {
   data.drawerBtnLoading = true
-  if (data.drawerType === DRAWER_TYPE.ADD_GROUP) {
-    result = dataStore.addGroup({
-      id: -1,
-      userId: dataStore.getUserInfo.id,
-      count: 0,
-      gname: data.createGroupForm.gname,
-      descr: data.createGroupForm.descr,
-      createTime: getCurrentDateStr(),
-      updateTime: ''
-    })
-  } else if (data.drawerType === DRAWER_TYPE.UPDATE_GROUP) {
-    result = dataStore.updateGroup(data.createGroupForm)
-  }
+  const { gname, descr } = data.createGroupForm
+
+  const method = {
+    [DRAWER_TYPE.ADD_GROUP]: dataStore.addGroup.bind(this, { gname, descr }),
+    [DRAWER_TYPE.UPDATE_GROUP]: dataStore.updateGroup.bind(this, data.createGroupForm)
+  }[data.drawerType as (DRAWER_TYPE.ADD_GROUP | DRAWER_TYPE.UPDATE_GROUP)]
+
+  const result = await method()
 
   if (!result) {
     message.error(data.drawerType === DRAWER_TYPE.ADD_GROUP ? '创建失败！' : '修改失败！')
     return
   }
 
-  setTimeout(() => {
-    data.drawerBtnLoading = false
-    data.drawerVisible = false
-    createGroupFormRef.value?.resetFields()
-    message.success(data.drawerType === DRAWER_TYPE.ADD_GROUP ? '创建成功！' : '修改成功！')
-  }, 1000)
+  data.drawerBtnLoading = false
+  data.drawerVisible = false
+  createGroupFormRef.value?.resetFields()
+  message.success(data.drawerType === DRAWER_TYPE.ADD_GROUP ? '创建成功！' : '修改成功！')
 }
 const deleteGroups = () => {
   if (data.deleteGroupIds.length === 0) {
     message.warn('请勾选要删除的分组！')
     return
   }
+
   Modal.confirm({
     centered: true,
     content: `分组中的待办将一起删除，确定要删除选中的分组吗？`,
     cancelText: '取消',
-    onOk() {
-      const result = dataStore.deleteGroupByIds(data.deleteGroupIds)
+    async onOk() {
+      const result = await dataStore.deleteGroupByIds(data.deleteGroupIds)
       data.drawerVisible = false
       if (result) {
         message.success('删除成功！')
@@ -360,12 +352,12 @@ const selectTheme = (themeNumber: number) => {
 const searchKeyWordChange = () => {
   if (!data.searchKeyWord && data.searchMode) {
     data.searchMode = false
-    data.selectedGroupId = dataStore.getGroups.length > 0 ? dataStore.getGroups[0].id : -1
+    data.selectedGroupId = dataStore.getGroups.length > 0 ? dataStore.getGroups[0].id : ''
     data.curSearchKeyWord = ''
   }
 }
 
-data.selectedGroupId = dataStore.getGroups[0].id
+// data.selectedGroupId = dataStore.getGroups[0].id
 watch(() => dataStore.getGroups, () => {
   const lastSelectedIdExit = dataStore.getGroups.some(group => group.id === data.selectedGroupId)
   if (!lastSelectedIdExit && dataStore.getGroups.length > 0) {
@@ -373,10 +365,14 @@ watch(() => dataStore.getGroups, () => {
   }
 })
 watch(() => data.selectedGroupId, (newVal) => {
-  if (newVal < 0) {
-    return
+  if (newVal) {
+    data.searchMode = false
   }
-  data.searchMode = false
+})
+
+// 获取分组数据
+dataStore.fetchGroup().then(result => {
+  result && (data.selectedGroupId = dataStore.getGroups[0].id)
 })
 </script>
 

@@ -30,13 +30,10 @@ groupRoute.get('/:id', async (request, response, next) => {
 // 新增分组
 groupRoute.post('/', async (request, response, next) => {
   try {
-    const user = request.auth
-    const resp = await GroupService.add({
-      userId: user.id,
-      gname: request.body.gname,
-      descr: request.body.descr
-    })
-    response.json(c(code.SUCCESS, 'ok', resp))
+    const userId = request.auth.id
+    const { gname, descr } = request.body
+    await GroupService.add({ userId, gname, descr })
+    response.json(c(code.SUCCESS, 'ok'))
   } catch (err) {
     response.json(c(code.FAILED, err.message))
   }
@@ -46,8 +43,11 @@ groupRoute.post('/', async (request, response, next) => {
 groupRoute.put('/', async (request, response, next) => {
   try {
     const group = request.body
-    const { modifiedCount } = await GroupService.update(group)
-    response.json(c(code.SUCCESS, 'ok!', modifiedCount))
+    const { modifiedCount: m } = await GroupService.update(group)
+    response.json(c(
+      m === 1 ? code.SUCCESS : code.FAILED,
+      m === 1 ? 'ok!' : 'group not found!',
+    ))
   } catch (err) {
     response.json(c(code.FAILED, err.message))
   }

@@ -76,7 +76,7 @@ import { useDataStore } from '@/stores/data'
 import type { Todo } from '@/types'
 
 const props = defineProps<{
-  groupId: number
+  groupId: string
 }>()
 const dataStore = useDataStore()
 const createTodoInfo = reactive({
@@ -103,7 +103,7 @@ const createTodo = () => {
   }
 
   const todo: Todo = {
-    id: -1,
+    id: '',
     groupId: props.groupId,
     done: 0,
     star: 0,

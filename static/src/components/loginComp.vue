@@ -72,14 +72,14 @@ const formState = reactive<FormState>({
   username: '',
   password: ''
 })
-const login = () => {
-  dataStore.login(formState).then(resp => {
-    console.log(resp)
-    message.success(resp.msg)
+const login = async () => {
+  try {
+    const loginResult = await dataStore.login(formState)
+    message.success(loginResult.msg)
     router.push('/home')
-  }, err => {
+  } catch (err: any) {
     message.error(err.message)
-  })
+  }
 }
 </script>
 

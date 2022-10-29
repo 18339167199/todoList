@@ -29,6 +29,7 @@ import { useRouter } from 'vue-router'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { useDataStore } from '@/stores/data'
 import defaultAvatar from '@/assets/images/avatar.jpeg'
+import { isTokenEffective } from '@/utils/util'
 
 const props = defineProps<{
   height: string
@@ -40,6 +41,10 @@ const dataStore = useDataStore()
 const logout = () => {
   dataStore.loginOut()
   router.push('/login')
+}
+
+if (isTokenEffective()) {
+  dataStore.restoreUserInfo()
 }
 </script>
 
