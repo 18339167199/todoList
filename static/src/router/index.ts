@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useDataStore } from '@/stores/data'
 import { isTokenEffective } from '@/utils/util'
 
 const router = createRouter({

@@ -197,7 +197,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, onUnmounted, ref, watch } from 'vue'
+import { computed, reactive, onUnmounted, ref } from 'vue'
 import TodoItemComp from '#/todoItemComp.vue'
 import { useDataStore } from '@/stores/data'
 import { DownOutlined } from '@ant-design/icons-vue'

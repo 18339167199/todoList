@@ -2,7 +2,7 @@ import axios from "axios"
 import type { AxiosRequestConfig, AxiosResponse, Method } from "axios"
 import globalLoading from "@/utils/globalLoading"
 import { isTokenEffective, getToken, clearToken } from "./util"
-import { useRouter } from 'vue-router'
+
 import { Modal } from 'ant-design-vue'
 
 interface ApiResponse {
