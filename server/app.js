@@ -68,10 +68,10 @@ app.use(function (err, req, res, next) {
 
 
 // 路由划分
-app.use('/', require('./routes/index'))
-app.use('/api/user', require('./routes/user'))
-app.use('/api/todo', require('./routes/todo'))
-app.use('/api/group', require('./routes/group'))
+app.use('/', require('./controller/index'))
+app.use('/api/user', require('./controller/user'))
+app.use('/api/todo', require('./controller/todo'))
+app.use('/api/group', require('./controller/group'))
 
 
 // catch 404 and forward to error handle
