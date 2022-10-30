@@ -116,12 +116,8 @@ export const useDataStore = defineStore('data', () => {
 
   // todo
   const fetchTodo = async (groupId: string) => {
-    if (!groupId) {
-      return false
-    }
-
     try {
-      const { code, data } = await getTodoByGroupIdApi(groupId)
+      const { code, data } = await getTodoByGroupIdApi(groupId || '')
       if (code === 0) {
         todos.splice(0, todos.length)
         todos.push(...data)
@@ -137,8 +133,6 @@ export const useDataStore = defineStore('data', () => {
       return code === 0
     } catch (err) {
       return false
-    } finally {
-      fetchTodo(todo.groupId)
     }
   }
   const updateTodoStatus = async ({ id, type, value }: { id: string, type: 'done' | 'star', value: 0 | 1 }) => {

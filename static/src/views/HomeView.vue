@@ -221,7 +221,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { onUnmounted, reactive, ref, watch } from 'vue'
 import AvatarComp from '#/avatarComp.vue'
 import GroupComp from '#/groupComp.vue'
 import TodoListComp from '#/todoListComp.vue'
@@ -349,12 +349,13 @@ const searchKeyWordChange = () => {
   }
 }
 
-watch(() => dataStore.getGroups, () => {
-  const lastSelectedIdExit = dataStore.getGroups.some(group => group.id === data.selectedGroupId)
+const clearSubscribe = dataStore.$subscribe((mutation, state) => {
+  const lastSelectedIdExit = state.groups.some(group => group.id === data.selectedGroupId)
   if (!lastSelectedIdExit && dataStore.getGroups.length > 0) {
     data.selectedGroupId = dataStore.getGroups[0].id
   }
 })
+
 watch(() => data.selectedGroupId, (groupId) => {
   if (groupId) {
     data.searchMode = false
@@ -368,6 +369,8 @@ dataStore.fetchGroup().then(result => {
     data.selectedGroupId = dataStore.getGroups[0].id
   }
 })
+
+onUnmounted(clearSubscribe)
 </script>
 
 <style lang="scss" scoped>

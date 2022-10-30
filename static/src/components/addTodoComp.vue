@@ -2,7 +2,7 @@
   <a-row class="add-todo">
     <a-input
       class="add-todo-input"
-      v-model:value.trim="createTodoInfo.content"
+      v-model:value="createTodoInfo.content"
       placeholder="添加待办"
       size="large"
       ref="addTodoInput"
@@ -24,7 +24,7 @@
               <a-textarea
                 :rows="4"
                 placeholder="待办备注"
-                :maxlength="6"
+                :maxlength="200"
                 v-model:value="createTodoInfo.note"
               />
             </template>
@@ -99,10 +99,14 @@ const createTodo = async () => {
 
   const result = await dataStore.addTodo({
     groupId: props.groupId,
-    content: createTodoInfo.content,
-    note: createTodoInfo.note,
+    content: createTodoInfo.content.trim(),
+    note: createTodoInfo.note.trim(),
     scheduledTime: createTodoInfo.scheduledTime
   })
+
+  dataStore.fetchGroup()
+  dataStore.fetchTodo(props.groupId)
+
   if (result) {
     message.success('添加成功！')
     clear()
