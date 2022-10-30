@@ -23,7 +23,7 @@ userRoute.get('/', async (request, response, next) => {
 })
 
 // 用户注册
-userRoute.post('/', async (request, response, next) => {
+userRoute.post('/register', async (request, response, next) => {
   try {
     const user = request.body
     const resp = await UserService.add(user)

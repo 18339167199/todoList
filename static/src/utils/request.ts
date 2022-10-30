@@ -71,16 +71,17 @@ axiosInstance.interceptors.response.use(
   error => {
     requestLoadingControler.closeLoading()
 
+    console.log(error)
+
     // 未登录错误，提示用户进行登录
-    if (error.response.status === 401) {
-      Modal.confirm({
+    if (error.response.data.code === 1001) {
+      Modal.warning({
         centered: true,
         content: `登录信息已过期，请重新登录！`,
         cancelText: '取消',
         onOk() {
           clearToken()
-          const router = useRouter()
-          router.push('/login')
+          window.location.href = window.location.origin + '/login'
         }
       })
       return

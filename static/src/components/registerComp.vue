@@ -59,11 +59,10 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { useDataStore } from '@/stores/data'
 import { ArrowRightOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import type { FormInstance } from 'ant-design-vue'
-import globalLoading from '@/utils/globalLoading'
+import { registerApi } from '@/api/user'
 
 type FormState = {
   username: string,
@@ -81,7 +80,6 @@ type FormConfig = {
 }
 
 const emit = defineEmits(['switch'])
-const dataStore = useDataStore()
 const registerForm = ref<FormInstance>()
 const formState = reactive<FormState>({
   username: '',
@@ -105,7 +103,7 @@ const formItems = reactive<{[propName in keyof FormState]: FormConfig}>({
     placeholder: '请输入用户名',
     rules: [
       { required: true, message: '请输入用户名' },
-      { min: 8, max: 16, message: '用户名长度为 8 ~ 16 个字符' }
+      { min: 4, max: 16, message: '用户名长度为 8 ~ 16 个字符' }
     ]
   },
   password: {
@@ -136,26 +134,30 @@ const formItems = reactive<{[propName in keyof FormState]: FormConfig}>({
     placeholder: '请输入昵称'
   }
 })
-const register = () => {
-  globalLoading.show()
-  dataStore.addUser({
-    id: -1,
-    username: formState.username,
-    password: formState.password,
-    email: formState.email,
-    nikeName: formState.nikeName
-  }).then(resp => {
-    globalLoading.hide()
-    emit('switch')
-    registerForm.value?.resetFields()
-    message.success(resp)
-  }, err => {
-    globalLoading.hide()
+const register = async () => {
+  console.log('register')
+  try {
+    const { code, msg } = await registerApi({
+      username: formState.username,
+      password: formState.password,
+      email: formState.email,
+      nikeName: formState.nikeName
+    })
+
+    if (code === 0) {
+      emit('switch')
+      registerForm.value?.resetFields()
+      message.success('注册成功!')
+    } else {
+      message.error(msg)
+    }
+  } catch (err: any) {
+    console.log(err)
     message.error(err.message)
-  })
+  }
 }
 const validateFailed = () => {
-  message.warn('请将必填项填写完整!')
+  message.warn('必填项未填写完整或格式不正确!')
 }
 </script>
 

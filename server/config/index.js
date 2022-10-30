@@ -5,7 +5,8 @@ module.exports = {
       '/',
       '/favicon.ico',
       '/api/user/error',
-      '/api/user/login'
+      '/api/user/login',
+      '/api/user/register'
     ]
   }
 }
