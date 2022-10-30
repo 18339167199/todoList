@@ -2,7 +2,6 @@ import { ref, computed, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import type { Todo, Group, User } from '@/types'
 import LocalStorage from '@/utils/localStroage'
-import { getCurrentDateStr } from '@/utils/util'
 import { clearToken } from '@/utils/util'
 import { TOKEN, TOKEN_EXPIRED } from '@/utils/constant'
 import { setToken } from '@/utils/util'
@@ -10,11 +9,11 @@ import { setToken } from '@/utils/util'
 // api
 import { loginApi, getUserInfoApi } from '@/api/user'
 import { getGroupApi, addGroupApi, updateGroupApi, deleteGroupApi } from '@/api/group'
+import { getTodoByGroupIdApi, addTodoApi, deleteTodoApi, updateTodoApi, moveToGroupApi, searchTodoApi } from '@/api/todo'
 
 export const useDataStore = defineStore('data', () => {
   const todos = reactive<Todo[]>([])
   const groups = reactive<Group[]>([])
-  const users = reactive<User[]>([])
   const loginUser = ref<User>({
     username: '',
     password: '',
@@ -73,96 +72,6 @@ export const useDataStore = defineStore('data', () => {
     }
   }
 
-  // user
-  const addUser = (user: User) => {
-    return new Promise<string>((resolve, reject) => {
-      if (!user.username || !user.password) {
-        reject(new Error('用户名或密码不能为空！'))
-        return
-      }
-
-      if (users.find(u => u.username === user.username)) {
-        reject(new Error('该用户名已存在，请更换后重试！'))
-        return
-      }
-      
-      // add user
-      user.id = ++userIdCount.value
-      user.nikeName = user.nikeName ? user.nikeName : 'todo007'
-      users.push(user)
-
-      // add default group
-      const group1: Group = {
-        id: -1,
-        userId: user.id,
-        count: 0,
-        gname: '我的一天',
-        descr: '每日计划',
-        createTime: getCurrentDateStr(),
-        updateTime: ''
-      }
-      const group2: Group = {
-        id: -1,
-        userId: user.id,
-        count: 0,
-        gname: '重要',
-        descr: '重要的事情',
-        createTime: getCurrentDateStr(),
-        updateTime: ''
-      }
-      const group3: Group = {
-        id: -1,
-        userId: user.id,
-        count: 0,
-        gname: '今天吃什么',
-        descr: '',
-        createTime: getCurrentDateStr(),
-        updateTime: ''
-      }
-      const group4: Group = {
-        id: -1,
-        userId: user.id,
-        count: 0,
-        gname: '娱乐活动安排',
-        descr: '放松身心，适当运动~',
-        createTime: getCurrentDateStr(),
-        updateTime: ''
-      }
-      addGroup(group1)
-      addGroup(group2)
-      addGroup(group3)
-      addGroup(group4)
-
-      // add default todo
-      const todo1: Todo = {
-        id: todos.length + 1,
-        groupId: group1.id,
-        done: 0,
-        star: 1,
-        content: '我的待办，今天的任务待完成!',
-        note: '',
-        createTime: getCurrentDateStr(),
-        updateTime: '',
-        scheduledTime: ''
-      }
-      const todo2: Todo = {
-        id: todos.length + 1,
-        groupId: group1.id,
-        done: 1,
-        star: 0,
-        content: '待办已完成，继续执行下一个计划!',
-        note: '',
-        createTime: getCurrentDateStr(),
-        updateTime: '',
-        scheduledTime: ''
-      }
-      addTodo(todo1)
-      addTodo(todo2)
-
-      setTimeout(resolve, 1000, '注册成功，请登录！')
-    })
-  }
-
   // group
   const fetchGroup = async () => {
     const resp = await getGroupApi()
@@ -174,7 +83,6 @@ export const useDataStore = defineStore('data', () => {
 
     return false
   }
-  const getGroupById = async (id: string) => groups.find(group => group.id === id)
   const addGroup = async (group: { gname: string, descr: string }) => {
     try {
       const { code } = await addGroupApi(group)
@@ -207,72 +115,79 @@ export const useDataStore = defineStore('data', () => {
   }
 
   // todo
-  const getTodoById = (id: number) => todos.find(todo => todo.id === id)
-  const addTodo = (todo: Todo): boolean => {
-    const group = getGroupById(todo.groupId)
-    if (!group) {
+  const fetchTodo = async (groupId: string) => {
+    if (!groupId) {
       return false
     }
-    todo.id = ++todoIdCount.value
-    todo.createTime = getCurrentDateStr()
-    todos.push(todo)
-    group.count ++
-    return true
-  }
-  const updateTodoStatus = ({ id, type, value }: { id: number, type: 'done' | 'star', value: 0 | 1 }) => {
-    const todo = getTodoById(id)
-    if (!todo) {
-      return false
-    }
-    todo[type] = value
-    todo.updateTime = getCurrentDateStr()
-    return true
-  }
-  const updateTodo = (todo: Todo) => {
-    const originTodo = getTodoById(todo.id)
-    if (!originTodo) {
-      return false
-    }
-    originTodo.content = todo.content
-    originTodo.note = todo.note
-    originTodo.updateTime = getCurrentDateStr()
-    originTodo.scheduledTime = todo.scheduledTime
-    return true
-  }
-  const deleteTodo = (id: number): boolean => {
-    const todo = getTodoById(id)
-    if (!todo) {
-      return false
-    }
-    const group = getGroupById(todo.groupId)
 
-    if (!group) {
+    try {
+      const { code, data } = await getTodoByGroupIdApi(groupId)
+      if (code === 0) {
+        todos.splice(0, todos.length)
+        todos.push(...data)
+      }
+    } catch (err) {
       return false
     }
-    todos.splice(todos.indexOf(todo), 1)
-    group.count --
-    return true
   }
-  const searchTodo = (keyWord: string): Todo[] => {
-    const loginUserId = loginUser.value.id
-    const groupIds = groups.filter(group => group.userId === loginUserId).map(group => group.id)
-    return todos.filter(todo => groupIds.includes(todo.groupId) && todo.content.includes(keyWord))
+  const getTodoById = (id: string) => todos.find(todo => todo.id === id)
+  const addTodo = async (todo: { groupId: string , content: string, note: string, scheduledTime: string }) => {
+    try {
+      const { code } = await addTodoApi(todo)
+      return code === 0
+    } catch (err) {
+      return false
+    } finally {
+      fetchTodo(todo.groupId)
+    }
   }
-  const moveToGroup = (todoId: number, groupId: number) => {
-    const todo = getTodoById(todoId)
-    const afterGroup = getGroupById(groupId)
-    if (!todo || !afterGroup || todo.groupId === afterGroup.id) {
+  const updateTodoStatus = async ({ id, type, value }: { id: string, type: 'done' | 'star', value: 0 | 1 }) => {
+    try {
+      const todo = getTodoById(id)
+      const { code } = await updateTodoApi({ id, [type]: value })
+      if (code === 0 && todo) {
+        todo[type] = value
+      }
+      return code === 0
+    } catch (err) {
       return false
     }
-    const beforeGroup = getGroupById(todo.groupId)
-    if (!beforeGroup) {
+  }
+  const updateTodo = async (todo: Todo) => {
+    try {
+      const { code } = await updateTodoApi(todo)
+      return code === 0
+    } catch (err) {
       return false
     }
-    beforeGroup.count --
-    afterGroup.count ++
-    todo.updateTime = getCurrentDateStr()
-    todo.groupId = afterGroup.id
-    return true
+  }
+  const deleteTodo = async (todoId: string) => {
+    try {
+      const { code } = await deleteTodoApi(todoId)
+      return code === 0
+    } catch (err) {
+      return false
+    }
+  }
+  const searchTodo = async (keyWord: string) => {
+    try {
+      const { code, data } = await searchTodoApi(keyWord)
+      if (code === 0) {
+        todos.splice(0, todos.length)
+        todos.push(...data)
+      }
+      return code === 0
+    } catch (err) {
+      return []
+    }
+  }
+  const moveToGroup = async (todoId: string, groupId: string) => {
+    try {
+      const { code } = await moveToGroupApi(todoId, groupId)
+      return code === 0
+    } catch (err) {
+      return false
+    }
   }
 
   /**
@@ -288,24 +203,18 @@ export const useDataStore = defineStore('data', () => {
   const getUserInfo = computed(() => loginUser.value)
 
   // group
-  const getGroups = computed(() => groups.filter(group => group.userId === loginUser.value.id))
+  const getGroups = computed(() => groups)
   const getGroupNameById = computed(() => (id: string) => {
     const group = groups.find(group => group.id === id)
-    if (!group) {
-      return ''
-    }
-    return group.gname
+    return group ? group.gname : ''
   })
 
   // todo
-  const getTodosByGroupId = computed(() => {
-    return (groupId: number) => todos.filter(todo => todo.groupId === groupId)
-  })
+  const getTodos = computed(() => todos)
 
   return {
     todos,
     groups,
-    users,
     loginUser,
     todoIdCount,
     groupIdCount,
@@ -313,12 +222,12 @@ export const useDataStore = defineStore('data', () => {
     login,
     loginOut,
     restoreUserInfo,
-    addUser,
     fetchGroup,
     addGroup,
     updateGroup,
     deleteGroupByIds,
     getTodoById,
+    fetchTodo,
     addTodo,
     updateTodoStatus,
     updateTodo,
@@ -329,6 +238,6 @@ export const useDataStore = defineStore('data', () => {
     getUserInfo,
     getGroups,
     getGroupNameById,
-    getTodosByGroupId
+    getTodos
   }
 })

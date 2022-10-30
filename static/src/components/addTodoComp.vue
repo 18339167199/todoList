@@ -73,11 +73,8 @@ import { reactive } from 'vue'
 import { PlusOutlined, BookOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { useDataStore } from '@/stores/data'
-import type { Todo } from '@/types'
 
-const props = defineProps<{
-  groupId: string
-}>()
+const props = defineProps<{ groupId: string }>()
 const dataStore = useDataStore()
 const createTodoInfo = reactive({
   content: '',
@@ -85,35 +82,27 @@ const createTodoInfo = reactive({
   scheduledTime: ''
 })
 const addTodoInput = ref()
-
 const disabledDate = (current: Dayjs) => {
   return dayjs().isAfter(current.endOf('day'))
 }
-
 const clear = () => {
   createTodoInfo.content = ''
   createTodoInfo.note = ''
   createTodoInfo.scheduledTime = ''
 }
-const createTodo = () => {
+const createTodo = async () => {
   if (!createTodoInfo.content) {
     message.warn('请输入待办内容！')
     addTodoInput.value?.focus()
     return
   }
 
-  const todo: Todo = {
-    id: '',
+  const result = await dataStore.addTodo({
     groupId: props.groupId,
-    done: 0,
-    star: 0,
     content: createTodoInfo.content,
     note: createTodoInfo.note,
-    createTime: '',
-    updateTime: '',
     scheduledTime: createTodoInfo.scheduledTime
-  }
-  const result = dataStore.addTodo(todo)
+  })
   if (result) {
     message.success('添加成功！')
     clear()

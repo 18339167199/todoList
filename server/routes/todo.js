@@ -10,7 +10,17 @@ todoRoute.get('/groupId/:groupId', async (request, response, next) => {
   try {
     const groupId = request.params.groupId
     const resp = await TodoService.findByGroupId(groupId)
-    response.json(c(code.SUCCESS, 'ok!', resp))
+    response.json(c(code.SUCCESS, 'ok!', resp.map(todo => ({
+      id: todo._id.toString(),
+      groupId: todo.groupId,
+      content: todo.content,
+      note: todo.note,
+      done: todo.done,
+      star: todo.star,
+      createTime: todo.createTime,
+      updateTIme: todo.updateTime,
+      scheduledTime: todo.scheduledTime
+    }))))
   } catch (err) {
     response.status(500).json(c(code.S_UNKOWN_ERROR, 'server error!'))
   }
@@ -30,9 +40,20 @@ todoRoute.get('/:id', async (request, response, next) => {
 // 模糊查询所有的 todo
 todoRoute.get('/search/:keyword', async (request, response, next) => {
   try {
+    const userId = request.auth.id
     const keyword = request.params.keyword
-    const resp = await TodoService.findByKeyword(keyword)
-    response.json(c(code.SUCCESS, 'ok!', resp))
+    const resp = await TodoService.findByKeyword(userId, keyword)
+    response.json(c(code.SUCCESS, 'ok!', resp.map(todo => ({
+      id: todo._id.toString(),
+      groupId: todo.groupId,
+      content: todo.content,
+      note: todo.note,
+      done: todo.done,
+      star: todo.star,
+      createTime: todo.createTime,
+      updateTIme: todo.updateTime,
+      scheduledTime: todo.scheduledTime
+    }))))
   } catch (err) {
     response.json(c(code.FAILED, err.message))
   }
@@ -53,8 +74,11 @@ todoRoute.post('/', async (request, response, next) => {
 todoRoute.put('/', async (request, response, next) => {
   try {
     const todo = request.body
-    const { modifiedCount } = await TodoService.update(todo)
-    response.json(c(code.SUCCESS, 'ok!', modifiedCount))
+    const { modifiedCount: m } = await TodoService.update(todo)
+    response.json(c(
+      m === 1 ? code.SUCCESS : code.FAILED,
+      m === 1 ? 'ok!' : 'todo not found!'
+    ))
   } catch (err) {
     response.json(c(code.FAILED, err.message))
   }
@@ -76,11 +100,11 @@ todoRoute.delete('/:id', async (request, response, next) => {
 todoRoute.get('/move/:todoId/:groupId', async (request, response, enxt) => {
   try {
     const { todoId, groupId } = request.params
-    const {  modifiedCount } = await TodoService.move(todoId, groupId)
-    if(modifiedCount === 0) {
+    const { modifiedCount: m } = await TodoService.move(todoId, groupId)
+    if(m === 0) {
       throw new Error('Parameter error!')
     }
-    response.json(c(code.SUCCESS, 'ok!', resp))
+    response.json(c(code.SUCCESS, 'ok!'))
   } catch (err) {
     response.json(c(code.FAILED, err.message))
   }

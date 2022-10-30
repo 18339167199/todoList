@@ -197,7 +197,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, onUnmounted, ref } from 'vue'
+import { computed, reactive, onUnmounted, ref, watch } from 'vue'
 import TodoItemComp from '#/todoItemComp.vue'
 import { useDataStore } from '@/stores/data'
 import { DownOutlined } from '@ant-design/icons-vue'
@@ -227,7 +227,7 @@ const data = reactive<{
   drawerVisible: boolean,
   searchKeyWord: string,
   modalVisible: boolean,
-  selectedGroupKeys: number[],
+  selectedGroupKeys: string[],
   curTodo: Todo
 }>({
   doneTodoShow: true,
@@ -276,8 +276,9 @@ const deleteTodo = () => {
     centered: true,
     content: `确定要删除待办“${data.curTodo.content}”吗？`,
     cancelText: '取消',
-    onOk() {
-      const result = dataStore.deleteTodo(data.curTodo.id)
+    async onOk() {
+      const result = await dataStore.deleteTodo(data.curTodo.id)
+      dataStore.fetchTodo(props.groupId)
       if (result) {
         message.success('删除成功！')
       } else {
@@ -287,27 +288,24 @@ const deleteTodo = () => {
     }
   })
 }
-const saveTodo = () => {
-  const result = dataStore.updateTodo(data.curTodo)
+const saveTodo = async () => {
+  const result = await dataStore.updateTodo(data.curTodo)
   if (result) {
     resetCurTodo()
     message.success('更新成功！')
     data.drawerVisible = false
+    dataStore.fetchTodo(props.groupId)
   } else {
     message.error('更新失败！')
   }
 }
-const updateTodoStatus = (type: 'done' | 'star', value: 0 | 1) => {
-  const result = dataStore.updateTodoStatus({
-    id: data.curTodo.id,
-    type,
-    value
-  })
+const updateTodoStatus = async (type: 'done' | 'star', value: 0 | 1) => {
+  data.drawerVisible = false
+  const result = await dataStore.updateTodoStatus({ id: data.curTodo.id, type, value })
   if (!result) {
     message.error('更新失败！')
     return
   }
-  data.curTodo[type] = value
   message.success(type === 'done'
     ? `已标记为${value ? '' : '未'}完成`
     : `已标记为${value ? '' : '不'}重要`
@@ -347,21 +345,25 @@ const tableData = computed(() => dataStore.getGroups
   .filter(group => group.id !== data.curTodo.groupId)
   .map(group => ({ key: group.id, ...group}))
 )
-const moveToGroup = () => {
+const moveToGroup = async () => {
   if (data.curTodo.id === '' || data.selectedGroupKeys.length === 0) {
     message.warn('请选择一个分组！')
     return
   }
-  const result = dataStore.moveToGroup(data.curTodo.id, data.selectedGroupKeys[0])
+
+  data.modalVisible = false
+  data.drawerVisible = false
+
+  const result = await dataStore.moveToGroup(data.curTodo.id, data.selectedGroupKeys[0])
   if (result) {
-    data.modalVisible = false
-    data.drawerVisible = false
+    dataStore.fetchGroup()
+    dataStore.fetchTodo(props.groupId)
     message.success(`待办已移动到"${dataStore.getGroupNameById(data.selectedGroupKeys[0])}"！`)
   } else {
     message.error('待办移动到其他分组失败！')
   }
 }
-const onSelectChange = (selectedGroupKeys: number[]) => {
+const onSelectChange = (selectedGroupKeys: string[]) => {
   data.selectedGroupKeys = selectedGroupKeys
 }
 
@@ -380,26 +382,21 @@ const getTodoStatus = computed(() => {
   }
   return tagConfig.pending
 })
-
 const doneTodo = computed(() => {
-  let dataSource = props.searchMode
-    ? dataStore.searchTodo(data.searchKeyWord)
-    : dataStore.getTodosByGroupId(props.groupId)
-  return dataSource.filter(todo => !!todo.done).sort((a: Todo, b: Todo) => b.star - a.star)
+  return dataStore.getTodos
+    .filter(todo => !!todo.done)
+    .sort((a: Todo, b: Todo) => b.star - a.star)
 })
-
 const undoneTodo = computed(() => {
-  let dataSource = props.searchMode
-    ? dataStore.searchTodo(data.searchKeyWord)
-    : dataStore.getTodosByGroupId(props.groupId)
-  return dataSource.filter(todo => !todo.done).sort((a: Todo, b: Todo) => b.star - a.star)
+  return dataStore.getTodos
+    .filter(todo => !todo.done)
+    .sort((a: Todo, b: Todo) => b.star - a.star)
 })
 
 const passKeyWordFunc = (keyWord: string) => {
   data.searchKeyWord = keyWord
 }
 bus.on('passKeyWord', passKeyWordFunc)
-
 onUnmounted(() => {
   bus.off('passKeyWord', passKeyWordFunc)
 })

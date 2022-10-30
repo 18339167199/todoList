@@ -35,12 +35,8 @@ import { message } from 'ant-design-vue'
 
 const props = defineProps<{ data: Todo }>()
 const dataStore = useDataStore()
-const updateTodoStatus = (type: 'done' | 'star', value: 0 | 1) => {
-  const result = dataStore.updateTodoStatus({
-    id: props.data.id,
-    type,
-    value
-  })
+const updateTodoStatus = async (type: 'done' | 'star', value: 0 | 1) => {
+  const result = await dataStore.updateTodoStatus({ id: props.data.id, type, value })
   if (result) {
     message.success(type === 'done'
       ? `已标记为${value ? '' : '未'}完成`

@@ -17,6 +17,11 @@ class GroupService {
    */
   static findByUserId = (userId) => GroupModel.find({ userId })
 
+  static getUserGroupIds = async (userId) => {
+    const groups = await GroupModel.find({ userId }, { _id: 1 })
+    return groups.map(group => group._id.toString())
+  }
+
   /**
    * 新增分组
    * @param {Group} group

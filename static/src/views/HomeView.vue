@@ -70,13 +70,7 @@
     <a-layout-content class="main" :data-color-mode="data.themeNumber">
       <a-row class="main-header">
         <a-col :span="12" style="text-align: left">
-          <h1>
-            {{
-              data.searchMode
-                ? `"${data.curSearchKeyWord}"搜索结果`
-                : dataStore.getGroupNameById(data.selectedGroupId)
-            }}
-          </h1>
+          <h1>{{ data.searchMode ? `"${data.curSearchKeyWord}"搜索结果` : dataStore.getGroupNameById(data.selectedGroupId) }}</h1>
         </a-col>
         <a-col
           :span="12" style="display: flex;
@@ -121,7 +115,7 @@
       <a-row class="main-footer">
         <add-todo-comp
         :group-id="data.selectedGroupId"
-        v-show="!data.searchMode"
+        v-show="!data.searchMode && !!data.selectedGroupId"
       />
       </a-row>
     </a-layout-content>
@@ -245,7 +239,6 @@ import { DRAWER_TYPE } from '@/utils/util'
 import LocalStorage from '@/utils/localStroage'
 import { Modal } from 'ant-design-vue'
 import bus from '@/utils/bus'
-import globalLoading from '@/utils/globalLoading'
 
 const dataStore = useDataStore()
 const data = reactive({
@@ -272,14 +265,11 @@ const onSearch = () => {
     return
   }
 
-  globalLoading.show()
-  setTimeout(() => {
-    globalLoading.hide()
-    data.curSearchKeyWord = data.searchKeyWord
-    bus.emit('passKeyWord', data.searchKeyWord)
-    data.searchMode = true
-    data.selectedGroupId = ''
-  }, 500)
+  data.curSearchKeyWord = data.searchKeyWord
+  bus.emit('passKeyWord', data.searchKeyWord)
+  data.searchMode = true
+  data.selectedGroupId = ''
+  dataStore.searchTodo(data.searchKeyWord)
 }
 const selectGroup = (groupId: string) => {
   if (groupId) {
@@ -350,29 +340,33 @@ const selectTheme = (themeNumber: number) => {
   LocalStorage.set('themeNumber', themeNumber)
 }
 const searchKeyWordChange = () => {
+  console.log(data.searchKeyWord)
   if (!data.searchKeyWord && data.searchMode) {
     data.searchMode = false
     data.selectedGroupId = dataStore.getGroups.length > 0 ? dataStore.getGroups[0].id : ''
+    dataStore.fetchTodo(data.selectedGroupId)
     data.curSearchKeyWord = ''
   }
 }
 
-// data.selectedGroupId = dataStore.getGroups[0].id
 watch(() => dataStore.getGroups, () => {
   const lastSelectedIdExit = dataStore.getGroups.some(group => group.id === data.selectedGroupId)
   if (!lastSelectedIdExit && dataStore.getGroups.length > 0) {
     data.selectedGroupId = dataStore.getGroups[0].id
   }
 })
-watch(() => data.selectedGroupId, (newVal) => {
-  if (newVal) {
+watch(() => data.selectedGroupId, (groupId) => {
+  if (groupId) {
     data.searchMode = false
+    dataStore.fetchTodo(groupId)
   }
 })
 
 // 获取分组数据
 dataStore.fetchGroup().then(result => {
-  result && (data.selectedGroupId = dataStore.getGroups[0].id)
+  if (result && dataStore.getGroups[0]?.id) {
+    data.selectedGroupId = dataStore.getGroups[0].id
+  }
 })
 </script>
 

@@ -21,7 +21,13 @@ class TodoService {
    * 按关键字模糊查询 todo
    * @param {string} keyword
    */
-  static findByKeyword = (keyword) => TodoModel.find({ content: new RegExp(keyword, 'i') })
+  static findByKeyword = async (userId, keyword) => {
+    // TodoModel.find({ content: new RegExp(keyword, 'i') })
+    const groupIds = await GroupService.getUserGroupIds(userId)
+    
+    console.log(groupIds)
+    return TodoModel.find({ content: new RegExp(keyword, 'i'), groupId: { $in: groupIds } })
+  }
 
   /**
    * 新增 todo
