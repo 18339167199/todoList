@@ -8,5 +8,8 @@ module.exports = {
       '/api/user/login',
       '/api/user/register'
     ]
+  },
+  dbConfig: {
+    url: 'mongodb://127.0.0.1:27017/todo'
   }
 }

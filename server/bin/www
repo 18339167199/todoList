@@ -8,6 +8,7 @@ const app = require('../app')
 const debug = require('debug')('server:server')
 const http = require('http')
 const mongoose = require('mongoose')
+const { dbConfig } = require('../config')
 
 /**
  * Get port from environment and store in Express.
@@ -26,12 +27,11 @@ const server = http.createServer(app)
  * After Connect to MongoDB
  * Listen on provided port, on all network interfaces.
  */
-const mongoDBURL = 'mongodb://127.0.0.1:27017/todo'
-mongoose.connect(mongoDBURL, { useNewUrlParser: true , useUnifiedTopology: true })
+mongoose.connect(dbConfig.url, { useNewUrlParser: true , useUnifiedTopology: true })
 mongoose.Promise = global.Promise
 const db = mongoose.connection
 db.on('connected', () => {
-  console.log('connect to mongoDB on: ' + mongoDBURL)
+  console.log('connect to mongoDB on: ' + dbConfig.url)
   console.log('start server!')
   server.listen(port)
   server.on('error', onError)
