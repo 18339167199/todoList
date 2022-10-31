@@ -60,7 +60,7 @@ app.use(expressjwt({
 app.use(function (err, req, res, next) {
   if (err.name === 'UnauthorizedError') {
     res.status(401).json(new ApiResponse({
-      msg: 'Please log in',
+      msg: 'please login!', 
       code: code.C_NOT_LOGIN_ERROR
     }))
   }

@@ -22,10 +22,7 @@ class TodoService {
    * @param {string} keyword
    */
   static findByKeyword = async (userId, keyword) => {
-    // TodoModel.find({ content: new RegExp(keyword, 'i') })
     const groupIds = await GroupService.getUserGroupIds(userId)
-    
-    console.log(groupIds)
     return TodoModel.find({ content: new RegExp(keyword, 'i'), groupId: { $in: groupIds } })
   }
 

@@ -1,5 +1,4 @@
 const express = require('express')
-const todo = require('../models/todo')
 const TodoService = require('../service/todo')
 const { c } = require('../utils/ApiResponse')
 const code = require('../utils/code')
