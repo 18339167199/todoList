@@ -135,7 +135,6 @@ const formItems = reactive<{[propName in keyof FormState]: FormConfig}>({
   }
 })
 const register = async () => {
-  console.log('register')
   try {
     const { code, msg } = await registerApi({
       username: formState.username,

@@ -69,7 +69,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8081/',
+        target: 'http://112.74.167.183:8080/', // 代理服务
         changeOrigin: true
       }
     }

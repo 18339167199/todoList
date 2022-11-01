@@ -340,7 +340,6 @@ const selectTheme = (themeNumber: number) => {
   LocalStorage.set('themeNumber', themeNumber)
 }
 const searchKeyWordChange = () => {
-  console.log(data.searchKeyWord)
   if (!data.searchKeyWord && data.searchMode) {
     data.searchMode = false
     data.selectedGroupId = dataStore.getGroups.length > 0 ? dataStore.getGroups[0].id : ''
@@ -349,10 +348,10 @@ const searchKeyWordChange = () => {
   }
 }
 
-const clearSubscribe = dataStore.$subscribe((mutation, state) => {
-  const lastSelectedIdExit = state.groups.some(group => group.id === data.selectedGroupId)
-  if (!lastSelectedIdExit && dataStore.getGroups.length > 0) {
-    data.selectedGroupId = dataStore.getGroups[0].id
+watch(dataStore.groups, (groups) => {
+  const lastSelectedIdExit = groups.some(group => group.id === data.selectedGroupId)
+  if (!lastSelectedIdExit && groups.length > 0) {
+    data.selectedGroupId = groups[0].id
   }
 })
 
@@ -369,8 +368,6 @@ dataStore.fetchGroup().then(result => {
     data.selectedGroupId = dataStore.getGroups[0].id
   }
 })
-
-onUnmounted(clearSubscribe)
 </script>
 
 <style lang="scss" scoped>

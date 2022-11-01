@@ -21,10 +21,6 @@ export const useDataStore = defineStore('data', () => {
     email: ''
   })
 
-  const todoIdCount = ref<number>(0)
-  const groupIdCount = ref<number>(0)
-  const userIdCount = ref<number>(0)
-
   /**
    * Actions
    */
@@ -36,7 +32,7 @@ export const useDataStore = defineStore('data', () => {
         loginUser.value = data
       }
     } catch (err) {
-      console.log('dataStore 33 line', err)
+      console.log(err)
     }
   }
 
@@ -73,14 +69,15 @@ export const useDataStore = defineStore('data', () => {
   }
 
   // group
+  const setGroups = (g: Group[]) => {
+    groups.splice(0, groups.length, ...g)
+  }
   const fetchGroup = async () => {
-    const resp = await getGroupApi()
-    if (resp.code === 0) {
-      groups.splice(0, groups.length)
-      groups.push(...resp.data)
+    const { code, data } = await getGroupApi()
+    if (code === 0) {
+      setGroups(data)
       return true
     }
-
     return false
   }
   const addGroup = async (group: { gname: string, descr: string }) => {
@@ -115,12 +112,14 @@ export const useDataStore = defineStore('data', () => {
   }
 
   // todo
+  const setTodos = (t: Todo[]) => {
+    todos.splice(0, todos.length, ...t)
+  }
   const fetchTodo = async (groupId: string) => {
     try {
       const { code, data } = await getTodoByGroupIdApi(groupId || '')
       if (code === 0) {
-        todos.splice(0, todos.length)
-        todos.push(...data)
+        setTodos(data)
       }
     } catch (err) {
       return false
@@ -167,8 +166,7 @@ export const useDataStore = defineStore('data', () => {
     try {
       const { code, data } = await searchTodoApi(keyWord)
       if (code === 0) {
-        todos.splice(0, todos.length)
-        todos.push(...data)
+        setTodos(data)
       }
       return code === 0
     } catch (err) {
@@ -210,9 +208,6 @@ export const useDataStore = defineStore('data', () => {
     todos,
     groups,
     loginUser,
-    todoIdCount,
-    groupIdCount,
-    userIdCount,
     login,
     loginOut,
     restoreUserInfo,
