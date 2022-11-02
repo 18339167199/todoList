@@ -66,6 +66,8 @@
         </a-tooltip>
       </a-row>
       </div>
+
+      <div style="position: absolute; bottom: 10%; left: 50%; transform: translate(-50%, 0); opacity: 0.4; user-select: none; -webkit-user-drag: none; font-size: 1rem">todoList v2.0</div>
     </a-layout-sider>
     <a-layout-content class="main" :data-color-mode="data.themeNumber">
       <a-row class="main-header">
