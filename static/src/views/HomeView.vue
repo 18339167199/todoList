@@ -221,7 +221,7 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, reactive, ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import AvatarComp from '#/avatarComp.vue'
 import GroupComp from '#/groupComp.vue'
 import TodoListComp from '#/todoListComp.vue'
@@ -398,6 +398,7 @@ $text-color-list:
   .sidebar {
     padding: 10px 20px 0;
     color: #fff;
+    background: #ba4345;
 
     .group-wrapper {
       position: relative;
