@@ -32,7 +32,7 @@
           }"
         >
           <span class="name">{{ props.data.gname }}</span>
-          <span class="badge" v-if="!!props.data.count">{{ props.data.count }}</span>
+          <span class="badge" v-if="!!props.data.todoCount">{{ props.data.todoCount }}</span>
         </a-row>
       </a-tooltip>
     </div>

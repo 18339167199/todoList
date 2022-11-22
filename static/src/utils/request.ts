@@ -26,9 +26,8 @@ const requestLoadingControler = {
 }
 
 const axiosInstance = axios.create({
-  baseURL: "/api",
-  timeout: 5000,
-  // withCredentials: true
+  baseURL: "https://c440up8jng.execute-api.ap-southeast-1.amazonaws.com/api",
+  timeout: 50000,
 })
 
 // 请求白名单，不需要登录就能访问
@@ -37,9 +36,7 @@ const requestWhiteList = [
   '/user/register'
 ]
 
-Object.assign(axiosInstance.defaults.headers, {
-  'Content-Type': 'application/json',
-})
+axiosInstance.defaults.headers["Content-Type"] = "application/json"
 
 axiosInstance.interceptors.request.use(
   (requestConfig: AxiosRequestConfig) => {

@@ -217,7 +217,7 @@ import { Modal, message } from 'ant-design-vue'
 import bus from '@/utils/bus'
 
 const props = defineProps<{
-  groupId: string,
+  groupId: number,
   searchMode: boolean
 }>()
 
@@ -227,7 +227,7 @@ const data = reactive<{
   drawerVisible: boolean,
   searchKeyWord: string,
   modalVisible: boolean,
-  selectedGroupKeys: string[],
+  selectedGroupKeys: number[],
   curTodo: Todo
 }>({
   doneTodoShow: true,
@@ -236,8 +236,8 @@ const data = reactive<{
   modalVisible: false,
   selectedGroupKeys: [],
   curTodo: {
-    id: '',
-    groupId: '',
+    id: -1,
+    groupId: -1,
     done: 0,
     star: 0,
     content: '',
@@ -260,8 +260,8 @@ const openDrawer = (todo: Todo) => {
 }
 const resetCurTodo = () => {
   data.curTodo = {
-    id: '',
-    groupId: '',
+    id: -1,
+    groupId: -1,
     done: 0,
     star: 0,
     content: '',
@@ -317,7 +317,7 @@ const updateTodoStatus = async (type: 'done' | 'star', value: 0 | 1) => {
 const iscurTodoChange = () => {
   const originTodo = dataStore.getTodoById(data.curTodo.id)
   const curTodo = data.curTodo
-  if (!originTodo || curTodo.id === '') {
+  if (!originTodo || curTodo.id === -1) {
     return false
   }
   return originTodo.content !== curTodo.content ||
@@ -349,7 +349,7 @@ const tableData = computed(() => dataStore.getGroups
   .map(group => ({ key: group.id, ...group}))
 )
 const moveToGroup = async () => {
-  if (data.curTodo.id === '' || data.selectedGroupKeys.length === 0) {
+  if (data.curTodo.id === -1 || data.selectedGroupKeys.length === 0) {
     message.warn('请选择一个分组！')
     return
   }
@@ -366,7 +366,7 @@ const moveToGroup = async () => {
     message.error('待办移动到其他分组失败！')
   }
 }
-const onSelectChange = (selectedGroupKeys: string[]) => {
+const onSelectChange = (selectedGroupKeys: number[]) => {
   data.selectedGroupKeys = selectedGroupKeys
 }
 

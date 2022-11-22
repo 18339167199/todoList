@@ -51,7 +51,7 @@
           添加分组
         </a-button>
 
-        <!-- <a-tooltip
+        <a-tooltip
           overlayClassName="btn-tooltip"
           placement="topRight"
           width="auto"
@@ -63,23 +63,11 @@
           <a-button class="group-add-btn" @click="openDrawer(DRAWER_TYPE.DELETE_GROUP)">
             <template #icon><DeleteOutlined /></template>
           </a-button>
-        </a-tooltip> -->
+        </a-tooltip>
       </a-row>
       </div>
 
-      <div
-        style="
-          position: absolute;
-          bottom: 10%;
-          left: 50%;
-          transform: translate(-50%, 0);
-          opacity: 0.4;
-          user-select: none;
-          -webkit-user-drag: none;
-          font-size: 1rem"
-        >
-          todoList v3.0
-        </div>
+      <div style="position: absolute; bottom: 10%; left: 50%; transform: translate(-50%, 0); opacity: 0.4; user-select: none; -webkit-user-drag: none; font-size: 1rem">todoList v3.0</div>
     </a-layout-sider>
     <a-layout-content class="main" :data-color-mode="data.themeNumber">
       <a-row class="main-header">
@@ -339,15 +327,13 @@ const deleteGroups = () => {
     content: `分组中的待办将一起删除，确定要删除选中的分组吗？`,
     cancelText: '取消',
     async onOk() {
-      // const result = await dataStore.deleteGroupByIds(data.deleteGroupIds)
-      // data.drawerVisible = false
-      // if (result) {
-      //   message.success('删除成功！')
-      // } else {
-      //   message.error('删除失败！')
-      // }
-
-      message.error('删除失败！')
+      const result = await dataStore.deleteGroupByIds(data.deleteGroupIds)
+      data.drawerVisible = false
+      if (result) {
+        message.success('删除成功！')
+      } else {
+        message.error('删除失败！')
+      }
     }
   })
 }

@@ -74,7 +74,7 @@ import { PlusOutlined, BookOutlined, CloseOutlined, CheckOutlined } from '@ant-d
 import { message } from 'ant-design-vue'
 import { useDataStore } from '@/stores/data'
 
-const props = defineProps<{ groupId: string }>()
+const props = defineProps<{ groupId: number }>()
 const dataStore = useDataStore()
 const createTodoInfo = reactive({
   content: '',
