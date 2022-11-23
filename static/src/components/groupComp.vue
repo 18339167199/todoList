@@ -70,7 +70,7 @@ const onDelete = () => {
     icon: createVNode(ExclamationCircleOutlined),
     cancelText: '取消',
     async onOk() {
-      const result = await dataStore.deleteGroupByIds([props.data.id])
+      const result = await dataStore.deleteGroupByIds(props.data.id)
       if (result) {
         message.success('删除成功！')
       } else {

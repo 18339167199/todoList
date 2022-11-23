@@ -48,7 +48,16 @@ export class Router {
             const data = R.getRequestData(event);
             controllerFunction(event, data).then(
                 (resp: any) => {
-                    response(null, ApiResponse.c(Code.SUCCESS, 'ok!', resp));
+                    const respData = {
+                        statusCode: 200,
+                        headers: {
+                            'Access-Control-Allow-Headers' : 'Content-Type',
+                            'Access-Control-Allow-Origin': 'http://lmb-todo.s3-website-ap-southeast-1.amazonaws.com/',
+                            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,DELETE,PUT'
+                        },
+                        body: JSON.stringify(ApiResponse.c(Code.SUCCESS, 'ok!', resp))
+                    }
+                    response(null, respData);
                 },
                 (error: any) => {
                     response(null, ApiResponse.c(Code.FAILED, error.message, error));

@@ -90,7 +90,7 @@ export const useDataStore = defineStore('data', () => {
       fetchGroup()
     }
   }
-  const updateGroup= async (group: { id: string, gname: string, descr: string }) => {
+  const updateGroup= async (group: { id: number, gname: string, descr: string }) => {
     try {
       const { code } = await updateGroupApi(group)
       return code === 0
@@ -100,9 +100,9 @@ export const useDataStore = defineStore('data', () => {
       fetchGroup()
     }
   }
-  const deleteGroupByIds = async (ids: string[]) => {
+  const deleteGroupByIds = async (id: number) => {
     try {
-      const { code } = await deleteGroupApi(ids)
+      const { code } = await deleteGroupApi(id)
       return code === 0
     } catch (err) {
       return false
@@ -115,9 +115,9 @@ export const useDataStore = defineStore('data', () => {
   const setTodos = (t: Todo[]) => {
     todos.splice(0, todos.length, ...t)
   }
-  const fetchTodo = async (groupId: string) => {
+  const fetchTodo = async (groupId: number) => {
     try {
-      const { code, data } = await getTodoByGroupIdApi(groupId || '')
+      const { code, data } = await getTodoByGroupIdApi(groupId || -1)
       if (code === 0) {
         setTodos(data)
       }
@@ -125,8 +125,8 @@ export const useDataStore = defineStore('data', () => {
       return false
     }
   }
-  const getTodoById = (id: string) => todos.find(todo => todo.id === id)
-  const addTodo = async (todo: { groupId: string , content: string, note: string, scheduledTime: string }) => {
+  const getTodoById = (id: number) => todos.find(todo => todo.id === id)
+  const addTodo = async (todo: { groupId: number , content: string, note: string, scheduledTime: string }) => {
     try {
       const { code } = await addTodoApi(todo)
       return code === 0
@@ -134,7 +134,7 @@ export const useDataStore = defineStore('data', () => {
       return false
     }
   }
-  const updateTodoStatus = async ({ id, type, value }: { id: string, type: 'done' | 'star', value: 0 | 1 }) => {
+  const updateTodoStatus = async ({ id, type, value }: { id: number, type: 'done' | 'star', value: 0 | 1 }) => {
     try {
       const todo = getTodoById(id)
       const { code } = await updateTodoApi({ id, [type]: value })
@@ -154,7 +154,7 @@ export const useDataStore = defineStore('data', () => {
       return false
     }
   }
-  const deleteTodo = async (todoId: string) => {
+  const deleteTodo = async (todoId: number) => {
     try {
       const { code } = await deleteTodoApi(todoId)
       return code === 0
@@ -173,7 +173,7 @@ export const useDataStore = defineStore('data', () => {
       return []
     }
   }
-  const moveToGroup = async (todoId: string, groupId: string) => {
+  const moveToGroup = async (todoId: number, groupId: number) => {
     try {
       const { code } = await moveToGroupApi(todoId, groupId)
       return code === 0
@@ -196,7 +196,7 @@ export const useDataStore = defineStore('data', () => {
 
   // group
   const getGroups = computed(() => groups)
-  const getGroupNameById = computed(() => (id: string) => {
+  const getGroupNameById = computed(() => (id: number) => {
     const group = groups.find(group => group.id === id)
     return group ? group.gname : ''
   })

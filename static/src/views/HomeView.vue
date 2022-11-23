@@ -51,7 +51,7 @@
           添加分组
         </a-button>
 
-        <a-tooltip
+        <!-- <a-tooltip
           overlayClassName="btn-tooltip"
           placement="topRight"
           width="auto"
@@ -63,11 +63,23 @@
           <a-button class="group-add-btn" @click="openDrawer(DRAWER_TYPE.DELETE_GROUP)">
             <template #icon><DeleteOutlined /></template>
           </a-button>
-        </a-tooltip>
+        </a-tooltip> -->
       </a-row>
       </div>
 
-      <div style="position: absolute; bottom: 10%; left: 50%; transform: translate(-50%, 0); opacity: 0.4; user-select: none; -webkit-user-drag: none; font-size: 1rem">todoList v2.0</div>
+      <div
+        style="
+          position: absolute;
+          bottom: 10%;
+          left: 50%;
+          transform: translate(-50%, 0);
+          opacity: 0.4;
+          user-select: none;
+          -webkit-user-drag: none;
+          font-size: 1rem"
+        >
+          todoList v3.0
+        </div>
     </a-layout-sider>
     <a-layout-content class="main" :data-color-mode="data.themeNumber">
       <a-row class="main-header">
@@ -116,9 +128,9 @@
       </a-row>
       <a-row class="main-footer">
         <add-todo-comp
-        :group-id="data.selectedGroupId"
-        v-show="!data.searchMode && !!data.selectedGroupId"
-      />
+          :group-id="data.selectedGroupId"
+          v-show="!data.searchMode && !!data.selectedGroupId"
+        />
       </a-row>
     </a-layout-content>
   </a-layout>
@@ -196,10 +208,10 @@
             :value="group.id"
           >
             <span
-              :data-count="group.count"
+              :data-count="group.todoCount"
               :class="{
                 'delete-checkbox-content': true,
-                'hide-badge': !group.count
+                'hide-badge': !group.todoCount
               }"
             >
               {{ group.gname }}</span>
@@ -248,14 +260,14 @@ const data = reactive({
   searchKeyWord: '',
   searchMode: false,
   curSearchKeyWord: '',
-  selectedGroupId: '',
+  selectedGroupId: -1,
   drawerVisible: false,
   drawerType: DRAWER_TYPE.ADD_GROUP,
   drawerBtnLoading: false,
   deleteGroupIds: [],
   themeNumber: LocalStorage.get<number>('themeNumber') || 1,
   createGroupForm: {
-    id: '',
+    id: -1,
     gname: '',
     descr: '',
   },
@@ -270,10 +282,10 @@ const onSearch = () => {
   data.curSearchKeyWord = data.searchKeyWord
   bus.emit('passKeyWord', data.searchKeyWord)
   data.searchMode = true
-  data.selectedGroupId = ''
+  data.selectedGroupId = -1
   dataStore.searchTodo(data.searchKeyWord)
 }
-const selectGroup = (groupId: string) => {
+const selectGroup = (groupId: number) => {
   if (groupId) {
     data.selectedGroupId = groupId
   }
@@ -289,7 +301,7 @@ const openDrawer = (type: DRAWER_TYPE, group?: Group) => {
 }
 const resetDrawerContent = (visible: boolean) => {
   if (!visible) {
-    data.createGroupForm.id = ''
+    data.createGroupForm.id = -1
     data.createGroupForm.gname = ''
     data.createGroupForm.descr = ''
     data.deleteGroupIds = []
@@ -327,13 +339,15 @@ const deleteGroups = () => {
     content: `分组中的待办将一起删除，确定要删除选中的分组吗？`,
     cancelText: '取消',
     async onOk() {
-      const result = await dataStore.deleteGroupByIds(data.deleteGroupIds)
-      data.drawerVisible = false
-      if (result) {
-        message.success('删除成功！')
-      } else {
-        message.error('删除失败！')
-      }
+      // const result = await dataStore.deleteGroupByIds(data.deleteGroupIds)
+      // data.drawerVisible = false
+      // if (result) {
+      //   message.success('删除成功！')
+      // } else {
+      //   message.error('删除失败！')
+      // }
+
+      message.error('删除失败！')
     }
   })
 }
@@ -344,7 +358,7 @@ const selectTheme = (themeNumber: number) => {
 const searchKeyWordChange = () => {
   if (!data.searchKeyWord && data.searchMode) {
     data.searchMode = false
-    data.selectedGroupId = dataStore.getGroups.length > 0 ? dataStore.getGroups[0].id : ''
+    data.selectedGroupId = dataStore.getGroups.length > 0 ? dataStore.getGroups[0].id : -1
     dataStore.fetchTodo(data.selectedGroupId)
     data.curSearchKeyWord = ''
   }

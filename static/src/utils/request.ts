@@ -28,6 +28,7 @@ const requestLoadingControler = {
 const axiosInstance = axios.create({
   baseURL: "/api",
   timeout: 5000,
+  // withCredentials: true
 })
 
 // 请求白名单，不需要登录就能访问
@@ -36,7 +37,9 @@ const requestWhiteList = [
   '/user/register'
 ]
 
-axiosInstance.defaults.headers["Content-Type"] = "application/json"
+Object.assign(axiosInstance.defaults.headers, {
+  'Content-Type': 'application/json',
+})
 
 axiosInstance.interceptors.request.use(
   (requestConfig: AxiosRequestConfig) => {

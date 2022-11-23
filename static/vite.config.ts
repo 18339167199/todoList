@@ -67,11 +67,11 @@ export default defineConfig({
   server: { // 开发代理配置
     port: 8080,
     open: true,
-    proxy: {
-      '/api': {
-        target: 'http://112.74.167.183:8080/', // 代理服务
-        changeOrigin: true
-      }
-    }
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://112.74.167.183:8080/', // 代理服务
+    //     changeOrigin: true
+    //   }
+    // }
   }
 })

@@ -13,4 +13,4 @@ export const addGroupApi = (data: any) => request('/group', 'post', data)
 export const updateGroupApi = (data: any) => request('/group', 'put', data)
 
 // 删除分组
-export const deleteGroupApi = (ids: string[]) => request(`/group/${ids.join(',')}`, 'delete')
+export const deleteGroupApi = (id: number) => request(`/group`, 'delete', { id })
