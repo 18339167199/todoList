@@ -1,0 +1,17 @@
+{
+  "name": "lamdba-auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "upload": "rm -rf ./dist/* && tsc && cd ./dist && npm install && jar -cfM ./dist.zip ./* && aws lambda update-function-code --profile lmb-aws --region ap-southeast-1 --function-name lmb-todo-auth --zip-file fileb://dist.zip && rm dist.zip && cd .."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jsonwebtoken": "^8.5.9",
+    "jsonwebtoken": "^8.5.1"
+  }
+}
