@@ -100,9 +100,9 @@ export const useDataStore = defineStore('data', () => {
       fetchGroup()
     }
   }
-  const deleteGroupByIds = async (ids: number[]) => {
+  const deleteGroupByIds = async (id: number) => {
     try {
-      const { code } = await deleteGroupApi(ids)
+      const { code } = await deleteGroupApi(id)
       return code === 0
     } catch (err) {
       return false

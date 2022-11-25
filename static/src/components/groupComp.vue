@@ -63,21 +63,21 @@ const onEdit = () => {
 }
 
 const onDelete = () => {
-  // popoverShow.value = false
-  // Modal.confirm({
-  //   centered: true,
-  //   content: `分组中的待办将一起删除，确定要删除分组“${props.data.gname}”吗？`,
-  //   icon: createVNode(ExclamationCircleOutlined),
-  //   cancelText: '取消',
-  //   async onOk() {
-  //     const result = await dataStore.deleteGroupByIds(props.data.id)
-  //     if (result) {
-  //       message.success('删除成功！')
-  //     } else {
-  //       message.error('删除失败！')
-  //     }
-  //   }
-  // })
+  popoverShow.value = false
+  Modal.confirm({
+    centered: true,
+    content: `分组中的待办将一起删除，确定要删除分组“${props.data.gname}”吗？`,
+    icon: createVNode(ExclamationCircleOutlined),
+    cancelText: '取消',
+    async onOk() {
+      const result = await dataStore.deleteGroupByIds(props.data.id)
+      if (result) {
+        message.success('删除成功！')
+      } else {
+        message.error('删除失败！')
+      }
+    }
+  })
 }
 </script>
 

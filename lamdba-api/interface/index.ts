@@ -29,3 +29,5 @@ export interface User {
     updateTime: string,
     createTime: string,
 }
+
+export type ResponseCallback = (error: Error | null, response: any) => void

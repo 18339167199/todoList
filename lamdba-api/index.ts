@@ -1,8 +1,9 @@
 'use strict';
 
+import type { ResponseCallback } from './interface';
 import { Router } from './router';
 
-export const handler = function (event: any, context: any, callback: (error: Error | null, data: any) => void) {
+export const handler = function (event: any, context: any, callback: ResponseCallback) {
     const route = new Router(
         {
             '/api/user': './controller/user.js',

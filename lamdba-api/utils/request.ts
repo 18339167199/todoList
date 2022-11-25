@@ -1,11 +1,11 @@
 import { Method } from './method.js';
 
 export const Request = {
-    getRequestURL(event: any) {
+    getRequestURL(event: any): string {
         return event.requestContext.http.path;
     },
 
-    getRequestMethod(event: any) {
+    getRequestMethod(event: any): string {
         return event.requestContext.http.method;
     },
 
