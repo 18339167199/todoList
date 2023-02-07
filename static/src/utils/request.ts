@@ -26,8 +26,9 @@ const requestLoadingControler = {
 }
 
 const axiosInstance = axios.create({
-  baseURL: "https://c440up8jng.execute-api.ap-southeast-1.amazonaws.com/api",
-  timeout: 50000,
+  // baseURL: "https://c440up8jng.execute-api.ap-southeast-1.amazonaws.com/api",
+  baseURL: 'http://127.0.0.1:8081/api',
+  timeout: 10000,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
@@ -43,7 +44,7 @@ const requestWhiteList = [
 axiosInstance.interceptors.request.use(
   (requestConfig: AxiosRequestConfig) => {
     // 打开 loading
-    requestLoadingControler.openLoading()
+    // requestLoadingControler.openLoading()
 
     // 白名单直接放行
     if (requestWhiteList.includes(requestConfig.url as string)) {
@@ -107,6 +108,7 @@ export default function request(
       headers,
     }).then(
       (resp: AxiosResponse<ApiResponse>) => {
+        console.log(resp)
         resolve(resp?.data)
       },
       (err: Error) => {

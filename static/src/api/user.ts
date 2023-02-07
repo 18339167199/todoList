@@ -8,3 +8,6 @@ export const registerApi = (data: any) => request('/user/register', 'post', data
 
 // 获取用户信息
 export const getUserInfoApi = () => request('/user', 'get')
+
+// error Request
+export const errorRequest = () => request('/error', 'get')

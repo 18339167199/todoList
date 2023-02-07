@@ -24,7 +24,15 @@ const router = createRouter({
         requireAuth: false,
       }
     },
-    { 
+    {
+      path: '/network',
+      name: 'network',
+      component: () => import(/* webpackChunkName: "LoginView" */ '@/views/NetWork.vue'),
+      meta: {
+        requireAuth: false,
+      }
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: '/home'
     }

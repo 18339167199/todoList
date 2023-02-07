@@ -3,6 +3,7 @@ const UserService = require('../service/user')
 const TokenService = require('../service/token')
 const { c } = require('../utils/ApiResponse')
 const code = require('../utils/code')
+const { response } = require('express')
 const userRoute = express.Router()
 
 // 获取用户信息
@@ -72,6 +73,11 @@ userRoute.post('/login', async (request, response, next) => {
     console.log('login error!', err)
     response.json(c(code.S_UNKOWN_ERROR, 'server error!'))
   }
+})
+
+// 超时
+userRoute.get('/timeout', async (request, response, next) => {
+  
 })
 
 module.exports = userRoute
