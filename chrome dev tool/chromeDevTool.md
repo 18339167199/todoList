@@ -1,7 +1,7 @@
 # Google Chrome 开发者工具
 
 ## 常用地址
-- [Chrome 开发者工具官网](https://developer.chrome.com/docs/)
+- [Chrome 开发者工具官方文档](https://developer.chrome.com/docs/)
 - [PageSpeed](https://pagespeed.web.dev/)
 - [PageSpeed Insights 网站性能测试工具文档](https://developers.google.com/speed/docs/insights/v5/about?hl=zh-cn)
 
@@ -19,7 +19,7 @@
       1. 关键词
       2. 正则表达式：/RegExp/
       3. 选项过滤（ctrl + 鼠标左键同时选中多个）
-      4. 时间过滤
+      4. 时间段过滤
          ![](./images/6.png)
 
 4. Preserve log  再刷新页面时，保留上一次请求的记录，可以用来对比上一次请求的结果和下一次请求的结果
@@ -100,20 +100,16 @@
 }
 ````
 
-8. ![](./images/8.png) 设置
+8. ![](./images/8.png) 其他设置
    - Show overview：展示时间轴的预览
    - Capture screenshots：展示实时截图预览，可以预览到不同时间段内页面加载情况和网络请求的状况
    ![](./images/9.png)
 
 
-
-### NetWork 主要内容
-1. 参考资料
-    - [Chrome Timing 名词介绍](https://developer.chrome.com/docs/devtools/network/reference/#timing-explanation)  
-    - [CSDN 资料](https://blog.csdn.net/Arlingtonroad/article/details/109852319)
+### 请求表
 
 #### 请求表中的属性
-![](./images/10.png)
+1. ![](./images/10.png)
    1. Name：资源名称和请求的路径
    2. Status: 状态码
    3. Type：请求的资源类型 script/stylesheet/png/xhr/...
@@ -127,19 +123,30 @@
       + script：由 script 执行的过程中发起
       + other：请求由其他过程发起，比如页面的连接点击
 
+2. 添加请求表中的属性，在请求表表头鼠标右键点击添加。
+
 #### 排序
 1. 点击请求表中表头排序  
    ![](./images/10.png)
 
-2. 根据请求中各阶段的时间来排序，在请求表头中，鼠标右键点击选中 **Waterfall** [Sort by activity phase 参考](https://developer.chrome.com/docs/devtools/network/reference/#sort-by-activity)
+2. 根据请求中各阶段的时间来排序，在请求表头中，鼠标右键点击选中 **Waterfall** [Sort by activity phase 参考](https://developer.chrome.com/docs/devtools/network/reference/#sort-by-activity)  
+   ![](./images/23.png)
    - Start Time（**默认**）：根据请求开始的时间来排序
    - Response Time：根据请求初始化到响应的时间来排序
    - End Time：根据请求结束的时间来排序
    - Total Duration：根据请求的总时长来排序
    - Latency：根据等待响应的最短时间来排序
 
-#### 请求的详细内容
-![](./images/11.png)
+#### 请求表数据统计  
+![](./images/st.png)
+1. 6 / 155 Requests：当前一共有 155 个请求，筛选出 6 个请求
+2. 208KB / 3.1MB transferred：当前通过网络加载的资源总共 3.1 MB，筛选出请求总共 208 KB
+3. 755KB / 4.5 resource：通过网络加载并解压完之后的资源总共 4.5 MB，筛选出请求总共 755KB
+4. Finash：5.44s：网页上的 http 请求发送到响应完成一共花费 5.44 秒
+5. DOMContentLoaded：388ms： DOM 树构建完成。即 HTML 页面由上向下解析 HTML 结构到末尾的封闭标签完成的时间
+6. Load：1.07s：页面加载一共花费 1.07 s
+
+<!-- ![](./images/11.png)
 
 1. Header
    - Response Headers：响应的请求头
@@ -152,7 +159,7 @@
 
 4. Preview：响应的 body 格式化后的信息
 
-6. 
+5.  -->
 
 #### 请求瀑布流（Timing）
 [Chrome Timing 名词介绍](https://developer.chrome.com/docs/devtools/network/reference/#timing-explanation)  
@@ -214,7 +221,7 @@
 
 
 ### 从 NetWork 出发的优化点
-1. 减少 HTTP 请求
+1. 减少 HTTP 请求，最快的请求就是从未发出的请求
    - 例如小图标转化为 Base64 或者使用 SVG
    - 图片懒加载
 2. 压缩 CSS，JS，图片文件，减少资源的体积
@@ -223,7 +230,7 @@
    - 确保所有的关键请求不被重定向
    - 确保关键请求资源是优化过的，压缩过的，可以缓存的要尽量缓存
 4. 避免过长的请求依赖链
-5. 控制资源加载的顺序
+5. 控制资源加载的顺序(优先级)
    - 请求优先级会被 preload 的使用所影响。预加载的资源会被分配为高优先级，并且在页面的初始加载中优先被请求。(字体，css等，避免滥用)
 ````html
     <link rel="preload" href="Calibre-Regular.woff2" as="font" crossorigin />
