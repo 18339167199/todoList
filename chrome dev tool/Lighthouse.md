@@ -1,8 +1,7 @@
 ## Lighthouse
 Chrome 开发者工具 Lighthouse 文档：https://developer.chrome.com/docs/lighthouse/   
 如何提升网站加载速度：https://web.dev/fast/#prioritize-resources  
-PageSpeed Web UI：https://pagespeed.web.dev/  
-Mode：https://github.com/GoogleChrome/lighthouse/blob/HEAD/docs/user-flows.md
+PageSpeed 在线测量工具：https://pagespeed.web.dev/  
 
 ----
 
@@ -76,4 +75,10 @@ Mode：https://github.com/GoogleChrome/lighthouse/blob/HEAD/docs/user-flows.md
    - Performance：各项性能指标
    - Accessibility：可访问性(无障碍)
    - SEO：seo情况
-   - Best Practices：最佳实践（页面的实现符合规范，）
+   - Best Practices [参考1](https://developer.chrome.com/docs/lighthouse/best-practices/) [参考2](https://codegino.com/blog/lighthouse-best-practices)：最佳实践，指页面的代码符合各种规范，例如 HTML 有 docType 的声明，img 标签有 alt 属性。浏览器控制台没有打印错误和警告，避免使用存在风险的第三方 JavaScript 库....
+   - Progressive Web App：渐进式 Web App 指标
+
+4. Publisher Ads：Lighthouse 通过一系列自动审核提高广告速度和测量广告的整体质量。
+
+### 
+
