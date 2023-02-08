@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <img id="img" src="" alt="flower" height="300" />
+        <p id="p1"></p>
+        <p style="color: red;">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Accusantium, quidem libero veritatis vero culpa earum nam voluptatibus reiciendis sapiente beatae quibusdam
+            omnis voluptas mollitia laborum eum voluptatum quis deserunt quisquam est? Laboriosam magnam voluptas sequi quam impedit corporis dignissimos et nisi! Recusandae quas,
+            delectus quidem unde ratione ducimus reiciendis distinctio, rem, asperiores quod consequatur. Cupiditate provident laboriosam est libero vel!
+        </p>
+        <button id="btn">插入一段文字</button>
+    </body>
+
+    <script>
+        window.onload = function() {
+            const imgSrc = '../images/flower.jpg'
+            const imgTag = document.getElementById('img')
+            const btn = document.getElementById('btn')
+
+            btn.addEventListener('click', () => {
+                const p1 = document.getElementById('p1')
+                p1.innerText = `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Accusantium, quidem libero veritatis vero culpa earum nam voluptatibus reiciendis sapiente beatae quibusdam
+                omnis voluptas mollitia laborum eum voluptatum quis deserunt quisquam est? Laboriosam magnam voluptas sequi quam impedit corporis dignissimos et nisi! Recusandae quas,
+                delectus quidem unde ratione ducimus reiciendis distinctio, rem, asperiores quod consequatur. Cupiditate provident laboriosam est libero vel!`
+            })
+
+            setTimeout(() => {
+                imgTag.setAttribute('src', imgSrc)
+            }, 2000)
+        }
+    </script>
+</html>
