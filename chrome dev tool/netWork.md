@@ -1,9 +1,5 @@
 # Google Chrome 开发者工具
-
-## 常用地址
-- [Chrome 开发者工具官方文档](https://developer.chrome.com/docs/)
-- [PageSpeed](https://pagespeed.web.dev/)
-- [PageSpeed Insights 网站性能测试工具文档](https://developers.google.com/speed/docs/insights/v5/about?hl=zh-cn)
+chrome 开发者工具 NetWork 文档：https://developer.chrome.com/docs/devtools/network/
 
 ## 一、NetWork
 ### 选项卡
@@ -99,16 +95,22 @@
     }
 }
 ````
+   - 导入 har 文件：将一个 har 文件导入 chrome 开发者工具并不会再发送一次请求，只是展示 har 文件的请求数据。
 
 8. ![](./images/8.png) 其他设置
    - Show overview：展示时间轴的预览
+     ![](./images/12.png)
    - Capture screenshots：展示实时截图预览，可以预览到不同时间段内页面加载情况和网络请求的状况
-   ![](./images/9.png)
+     ![](./images/9.png)
+   - Use large request rows：使用更详细的请求查看视图
+     ![](./images/13.png)
+   - Group by frame：根据 iframe 分组
+     ![](./images/14.png)
 
 
 ### 请求表
 
-#### 请求表中的属性
+#### 请求表表头中的属性
 1. ![](./images/10.png)
    1. Name：资源名称和请求的路径
    2. Status: 状态码
@@ -123,11 +125,10 @@
       + script：由 script 执行的过程中发起
       + other：请求由其他过程发起，比如页面的连接点击
 
-2. 添加请求表中的属性，在请求表表头鼠标右键点击添加。
+2. 添加请求表表头属性，在请求表表头鼠标右键点击添加。
 
 #### 排序
 1. 点击请求表中表头排序  
-   ![](./images/10.png)
 
 2. 根据请求中各阶段的时间来排序，在请求表头中，鼠标右键点击选中 **Waterfall** [Sort by activity phase 参考](https://developer.chrome.com/docs/devtools/network/reference/#sort-by-activity)  
    ![](./images/23.png)
@@ -161,8 +162,7 @@
 
 5.  -->
 
-#### 请求瀑布流（Timing）
-[Chrome Timing 名词介绍](https://developer.chrome.com/docs/devtools/network/reference/#timing-explanation)  
+#### 请求瀑布流（Timing）[Chrome Timing 名词介绍](https://developer.chrome.com/docs/devtools/network/reference/#timing-explanation)  
 
 1. Queued at：表示请求加入到请求队列中的 **时刻**
 2. Started at：表示请求开始处理的 **时刻**
@@ -175,50 +175,51 @@
 #### 请求队列
 1. 浏览器的并发机制  
    在浏览器刚刚流行的时候，大部分用户是通过拨号来上网，由于受当时的带宽条件的限制，无法使得用户的同时多个请求被处理。同时，当时的服务器的配置也比现在差很多，所以现在每个浏览器的连接数的大小也是有必要的。浏览器默认对同一域下的资源，只保持一定的连接数，阻塞过多的连接,以提高访问速度和解决阻塞问题。不同浏览器的默认值不一样，目前常用的 Chrome 版本的最大连接数量是 6。  
-   | Browser | HTTP/1.1 | HTTP/1.0 |
-   |---|---|---|
-   | IE 6,7 | 2 |4 |
-   | IE 8 | 6 | 6 |
-   | Firefox 2 | 2 | 8 |
-   | Firefox 3 | 6 | 6 |
-   | Safari 3,4 | 4 | 4 |
-   | Chrome 1,2 | 6| ? |
-   | Chrome 3 | 4 | 4 |
-   | Chrome 4+ | 6 | ? |
-   | iPhone 2 |	4 |	? |
-   | iPhone 3 | 6 | ? |
-   | iPhone 4 | 4 | ? |
-   | Opera 9.63,10.00alpha | 4 | 4
-   | Opera 10.51+ | 8 | ? |
+   | Browser               | HTTP/1.1 | HTTP/1.0 |
+   | --------------------- | -------- | -------- |
+   | IE 6,7                | 2        | 4        |
+   | IE 8                  | 6        | 6        |
+   | Firefox 2             | 2        | 8        |
+   | Firefox 3             | 6        | 6        |
+   | Safari 3,4            | 4        | 4        |
+   | Chrome 1,2            | 6        | ?        |
+   | Chrome 3              | 4        | 4        |
+   | Chrome 4+             | 6        | ?        |
+   | iPhone 2              | 4        | ?        |
+   | iPhone 3              | 6        | ?        |
+   | iPhone 4              | 4        | ?        |
+   | Opera 9.63,10.00alpha | 4        | 4        |
+   | Opera 10.51+          | 8        | ?        |
 
    数据来源：http://www.stevesouders.com/blog/2008/03/20/roundup-on-parallel-connections/  
 
 2. 请求超时时间（Connection Timeout）  
-   对于一般的 HTTP 请求来说，请求超时时间代表的是客户端最大的等待时间。超时时间是从请求被创建（不管该请求有没有进入请求队列中）开始计算，  
+   对于一般的 HTTP 请求来说，请求超时时间代表的是客户端最大的等待时间。超时时间是从请求被创建（无论该请求是否进入请求队列中）开始计算，  
    也就是说，如果请求队列中的请求一直未能释放，那么后面的请求就无法进入请求队列中，导致经过了一定的时间后就超时取消了。
 
 3. 请求的优先级 [请求之间的优先级](https://blog.csdn.net/hbiao68/article/details/119871598)  
-   不同类型的请求优先级不一致，优先级较高的请求会先进入到请求队列中优先处理，优先级从低到高  
-   同种资源的优先级还会受到
-   依次为：Lowest、Low、Medium、High、Highest
-   
-   Chrome 中不同资源的优先级
-   | 资源类型 | 优先级 |
-   | --- |--- |
-   | HTML | Highest |
-   | CSS | Highest |
-   | 通过 @import 加载的 Stylesheets | Highest，会被安排在阻塞脚本之后 |
-   | Fonts | High |
-   | 图片 | 默认是 Low，如果在视口窗口中渲染升级未 High|
-   | JavaScript | Low / Medium / High，参考 https://addyosmani.com/blog/script-priorities/ |
+   - 不同类型的请求优先级不一致，优先级较高的请求会先进入到请求队列中优先处理，优先级从低到高依次为：Lowest、Low、Medium、High、Highest 
+   - 同种资源的优先级还会受到不同因素的影响
+      + 静态资源请求的优先级会受到 preload / prefetch 的影响
+      + script 标签会受到 defer / async 属性的影响
+      + 图片资源根据位置的不同有不同的优先级，例如位于视口范围内优先级为 High，位于视口之外的优先级为 Low
+   - Chrome 中不同资源的优先级列表
 
+   | 资源类型                        | 优先级                                                                   |
+   | ------------------------------- | ------------------------------------------------------------------------ |
+   | HTML                            | Highest                                                                  |
+   | CSS                             | Highest                                                                  |
+   | 通过 @import 加载的 Stylesheets | Highest，会被安排在阻塞脚本之后                                          |
+   | Fonts                           | High                                                                     |
+   | 图片                            | 默认是 Low，如果在视口窗口中渲染升级未 High                              |
+   | JavaScript                      | Low / Medium / High，参考 https://addyosmani.com/blog/script-priorities/ |
 
 4. 关键请求  
-   关键请求就是显示在页面初始窗口时必要的请求资源。
+   关键请求就是首屏加载必要的请求资源。
+   - 保证最初的5个请求
 
-5. 请求用来链  
-   当浏览器在发出请求是由于另一个请求引用它时（也称为依赖项），我们称之为请求链。
-
+5. 请求依赖链  
+   当浏览器在发出请求是由于另一个请求引用它时（也称为依赖项），称之为请求依赖链。
 
 ### 从 NetWork 出发的优化点
 1. 减少 HTTP 请求，最快的请求就是从未发出的请求
@@ -235,8 +236,10 @@
 ````html
     <link rel="preload" href="Calibre-Regular.woff2" as="font" crossorigin />
 ````
-   - 资源预读取，关键字 prefetch 作为元素 的属性 rel 的值，是为了提示浏览器，用户未来的浏览有可能需要加载目标资源，所以浏览器有可能通过事先获取和缓存对应资源，优化用户体验。浏览器会在空闲的时间去提前加载该资源。
+   - 资源预读取，关键字 prefetch 作为元素 的属性 rel 的值，是为了提示浏览器用户未来的浏览有可能需要加载目标资源，所以浏览器有可能在空闲的时间内通过事先获取和缓存对应资源，优化用户体验。
 ````
 <link rel="prefetch" href="https://i.snssdk.com/slardar/sdk.js" />
 ````
-   - script 标签的引用配合 defer 和 async （[defer 和 async](https://blog.csdn.net/mrlmx/article/details/127581208)，[defer 和 async 对 script 标签优先级的影响](https://addyosmani.com/blog/script-priorities/)）
+   - script 标签的引用配合 defer 和 async （[defer 和 async](https://blog.csdn.net/mrlmx/article/details/127581208)，[defer 和 async 对 script 脚本优先级的影响](https://addyosmani.com/blog/script-priorities/)）
+      + defer 让 script 脚本在解析 HTML 文件时同步下载，在 HTML 文件解析完成之后，DOMContentLoaded 事件之前执行 script 脚本
+      + async 让 script 脚本在解析 HTML 文件时同步下载，在 script 脚本下载完成之后马上执行脚本（不论 HTML 文件是否解析完成，若 HTML 文件未解析完成将阻塞 HTML 的解析）
