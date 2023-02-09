@@ -7,10 +7,9 @@ PageSpeed 在线测量工具：https://pagespeed.web.dev/
 
 ### 一、使用方式
 1. Chrome 开发者工具栏中 Lighthouse  
-   ![](./images/15.png)
 2. 作为 Node 模块加载 [参考](https://www.npmjs.com/package/lighthouse)
    - npm install -g lighthouse
-   - lighthouse <url>：对指定的 url 执行测试
+   - lighthouse \<url\>：对指定的 url 执行测试
 3. PageSpeed Web UI：https://pagespeed.web.dev/
 
 ### 二、性能指标
@@ -20,7 +19,7 @@ PageSpeed 在线测量工具：https://pagespeed.web.dev/
 #### 指标评分标准
 1. <font color=red>0 - 49</font>：显示红色，该指标表现很差
 2. <font color=orange>50 - 89</font>：显示橙色，该指标当前状态较好，但还可以改善
-3. <font color=green>90 - 100</font>：显示绿色，该指标状态很好
+3. <font color=green>90 - 100</font>：显示绿色，该指标状态优秀
 
 #### 内容呈现相关
 1. <font color=red>*</font> FCP ( First Contentful Paint )  
@@ -36,6 +35,9 @@ PageSpeed 在线测量工具：https://pagespeed.web.dev/
    **累计布局位移偏离**，记录了页面上非预期的元素位移波动。CLS 的值越低说明页面跳来跳去的情况越少，用户体验越好。 
     - 例如页面上图片从未加载的状态到加载完成之后的状态，造成图片后的元素产生位移的情况    
         <img src="./images/16.png" width="800" />
+
+        ----
+
         <img src="./images/17.png" width="800" />
     - 在文档中插入一段内容之后，造成之后的元素位移的情况。
 
@@ -61,24 +63,108 @@ PageSpeed 在线测量工具：https://pagespeed.web.dev/
 3. <font color=red>*</font> FID ( First Input Delay )  
    **首次输入延迟**，记录在 FCP 和 TTI 之间用户首次与页面交互时响应的延迟。记录第一次与页面交互到浏览器真正能够处理响应该交互的时间，这个延迟出现的原因是浏览器的主线程可能在忙于其他工作，比如解析 JS 文件等，所以无法及时响应用户。
 
-### 三、Chrome Lighthouse 界面介绍
+### 三、Chrome Lighthouse
+Lighthouse 测试的结果，会受到 Chrome 插件、缓存等因数的影响。例如 Chrome 中安装了[油猴](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=zh-CN)，在网站打开时加载了一段脚本，这段脚本的加载和运行会影响到 Lighthouse 测试的结果。  
+
+推荐的做法：
+  - **打开一个无痕模式的窗口，且确保 NetWork 中 Disable cache 勾选之后再进行测试**  
+      ![](./images/20.png)
+  - **使用 [Pagespeed：https://pagespeed.web.dev/](https://pagespeed.web.dev/)**
+  - **作为 Node 模块使用**
+
+#### 界面可选项
 1. Mode [参考](https://github.com/GoogleChrome/lighthouse/blob/HEAD/docs/user-flows.md)：测试模式
    - Navigation（默认）：分析单个页面加载情况
    - Timespan：分析任意一段时间内的页面运行情况，包括期间用户的操作
    - Snapshot：分析页面在当前时刻的状态
 
-2. Device：测试的设备
-   - Mobile
-   - Desktop
+2. Device：设备模式
+   - Mobile：移动端显示结果
+   - Desktop：桌面端的显示结果
 
 3. Categories：测试项目
    - Performance：各项性能指标
    - Accessibility：可访问性(无障碍)
    - SEO：seo情况
-   - Best Practices [参考1](https://developer.chrome.com/docs/lighthouse/best-practices/) [参考2](https://codegino.com/blog/lighthouse-best-practices)：最佳实践，指页面的代码符合各种规范，例如 HTML 有 docType 的声明，img 标签有 alt 属性。浏览器控制台没有打印错误和警告，避免使用存在风险的第三方 JavaScript 库....
+   - Best Practices [参考1：Chrome 文档](https://developer.chrome.com/docs/lighthouse/best-practices/) [参考2：最佳实践包含的方面](https://codegino.com/blog/lighthouse-best-practices)  
+     最佳实践，指页面的代码符合各种规范，例如 HTML 有 docType 的声明，img 标签有 alt 属性。浏览器控制台没有打印错误和警告，避免使用存在风险的第三方 JavaScript 库，避免使用即将要弃用的API，....
    - Progressive Web App：渐进式 Web App 指标
 
 4. Publisher Ads：Lighthouse 通过一系列自动审核提高广告速度和测量广告的整体质量。
 
-### 
+### 执行测试，获取各项指标的结果和优化建议
+1. 打开一个无痕窗口访问, https://cast.coolkit.cn/#/login （cast 登录页）,保证 NetWork 中的 Disable cache 选项勾选,
 
+2. Lighthouse 配置如下
+   ![](./images/18.png)
+
+3. 测试结果受到本机当前网络好坏的影响，建议多测几次后取一个比较稳定的结果  
+  ![](./images/19.png)  
+  ![](./images/21.png)
+
+
+### 常用的优化方法
+https://web.dev/fast/#prioritize-resources  
+https://zhuanlan.zhihu.com/p/376925215
+
+#### 关键指标的优化
+1. LCP 首屏加载相关 [参考](https://web.dev/optimize-lcp/)
+   - 使用 CDN 内容分发网络
+   - 启用 Gzip 压缩
+   - 使用合理的缓存机制，对 HTML、图片资源、将库文件提取为 vendor 后设置合理的缓存
+
+   - 减少阻塞的 JS 和 CSS 文件大小
+     + 压缩 JS 和 CSS
+     + 查看代码的覆盖率，考虑将所有未使用的 CSS 完全删除或者拆分打包到其他的样式表中  
+       ![](./images/24.png)
+     + 延迟加载未使用的 JS 和 CSS
+   - 优化图片资源
+     + 超出首屏外的图片懒加载
+     + 体积较小的图标考虑转化为 base64 格式或者使用 svg, 以减少网络请求
+     + 使用合适格式的图片资源，JPG/JPEG 格式通常比 PNG 格式图片小
+     + 在 Chrome 中支持使用 Webp 格式的图片，可以进一步的缩小图片的体积在移动端时提供一张小尺寸的图片,桌面端时提供一张大尺寸的图片
+         ````html
+         <!-- 使用 pictrue 标签提供多种图片资源，浏览器根据自身支持情况选择加载合适的图片 -->
+         <picture>
+            <!-- 在屏幕宽度为 768px 时, 使用小尺寸图片 -->
+            <source srcset="small-img.png" media="(max-width: 768px)" />
+
+            <!-- webp 格式 -->
+            <source srcset="img.webp">
+
+            <!-- 默认格式 -->
+            <img src="img.png">
+         </picture>
+         ````
+   - 预加载重要的资源  
+      如果你知道某个特定资源应该被优先获取，请使用<link rel="preload">来更加及时地获取该资源。 多种类型的资源都可以进行预加载，但你应该首先侧重于预加载关键资产，例如字体、首屏图像或视频，以及关键路径 CSS 或 JavaScript。
+      ````html
+      <link rel="preload" as="script" href="script.js" />
+      <link rel="preload" as="style" href="style.css" />
+      <link rel="preload" as="image" href="img.png" />
+      <link rel="preload" as="video" href="vid.webm" type="video/webm" />
+      <link rel="preload" href="font.woff2" as="font" type="font/woff2" crossorigin />
+      ```` 
+
+2. CLS [参考](https://web.dev/optimize-cls/)
+   - img 标签带上 height 或者 width 属性, 或者通过包裹一个固定长宽的容器确保浏览器在加载图像期间可以正确分配空间的大小
+     ````html
+     <img src="img.png" height="120" />
+
+     <div style="height: 120px;">
+        <img src="img.png" height="120" />
+     </div>
+     ````
+   - 为 ifame 或者其他元素的插入预留空间
+   - 让用户决定是否加载某一部分的内容
+   - 某些元素在做动画时不要对其他元素产生位移影响
+   
+
+3. FID [参考](https://web.dev/optimize-fid/)  
+   糟糕的输入延迟大部分是由于 **执行繁重的 JavaScript 任务** 导致, 主要的优化方法还是优化 JavaScript 的加载, 避免 JavaScript 执行的时间过长导致用户在与页面交互时没法及时响应.
+
+4. 代码方面的优化
+   - 组件中手动绑定了事件, 要在组件销毁的时候手动解绑
+   - 区分 v-show 和 v-if 的使用情况
+   - 使用 v-for 时必须添加 key 属性
+   - ...
