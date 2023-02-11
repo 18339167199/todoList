@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务队列</title>
+</head>
+<body>
+    <div style="height: 100px; width: 100px; background: red;" id="div"></div>
+
+    <!-- <div style="height: 100px; width: 100px; background: #ccc;" id="div2">setTimeout</div> -->
+
+    <script>
+        const div = document.getElementById('div')
+
+        function myThen(result) {
+            console.log('then')
+        }
+        function myThen2(result) {
+            console.log('then 2')
+        }
+
+        function fn1() {
+            console.log('fn1')
+            new Promise((resolve, reject) => {
+                fn4()
+                resolve(true)
+            }).then(myThen)
+            new Promise((resolve, reject) => {
+                resolve(true)
+            }).then(myThen2)
+        }
+        function fn2() {
+            setTimeout(fn2Timer)
+        }
+        function fn3() {
+            console.log('fn3')
+        }
+        function fn4() {
+            console.log('fn4')
+        }
+
+        function fn2Timer() {
+            console.log('fn2Timer')
+        }
+
+        function clickFn() {
+            fn1()
+            fn2()
+            fn3()
+            div.style.background = 'yellow'
+        }
+
+        div.addEventListener('click', clickFn)
+
+        /**
+        
+          Task
+            Function call
+            clickFn
+            fn1
+            fn2
+            setTimeout install
+            fn3
+
+          Task
+            fn2Timer
+        */
+    </script>
+</body>
+</html>

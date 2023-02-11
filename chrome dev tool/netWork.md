@@ -162,16 +162,6 @@ chrome 开发者工具 NetWork 文档：https://developer.chrome.com/docs/devtoo
 
 5.  -->
 
-#### 请求瀑布流（Timing）[Chrome Timing 名词介绍](https://developer.chrome.com/docs/devtools/network/reference/#timing-explanation)  
-
-1. Queued at：表示请求加入到请求队列中的 **时刻**
-2. Started at：表示请求开始处理的 **时刻**
-3. Queueing：表示清除从加入请求队列中到请求开始处理经过的时间
-4. Stalled：请求在可以被发送出去之前等待的时间（阻塞时间），一般是等待 TCP 连接建立完成到真正可以传输数据之间的时间差
-5. Request sended：请求发送所需的时间
-6. Waiting：从发出请求到到接收到响应的第一个字节所需的时间
-7. Content Download：接收到完整的响应体（Response body）所花费的时间
-
 #### 请求队列
 1. 浏览器的并发机制  
    在浏览器刚刚流行的时候，大部分用户是通过拨号来上网，由于受当时的带宽条件的限制，无法使得用户的同时多个请求被处理。同时，当时的服务器的配置也比现在差很多，所以现在每个浏览器的连接数的大小也是有必要的。浏览器默认对同一域下的资源，只保持一定的连接数，阻塞过多的连接,以提高访问速度和解决阻塞问题。不同浏览器的默认值不一样，目前常用的 Chrome 版本的最大连接数量是 6。  
@@ -191,6 +181,10 @@ chrome 开发者工具 NetWork 文档：https://developer.chrome.com/docs/devtoo
    | Opera 9.63,10.00alpha | 4        | 4        |
    | Opera 10.51+          | 8        | ?        |
 
+   同一时间向同域名下不同地址的接口发送请求，最多处理6个请求，其它的全部挂起  
+   如果浏览器同时向
+
+
    数据来源：http://www.stevesouders.com/blog/2008/03/20/roundup-on-parallel-connections/  
 
 2. 请求超时时间（Connection Timeout）  
@@ -201,7 +195,15 @@ chrome 开发者工具 NetWork 文档：https://developer.chrome.com/docs/devtoo
    - 不同类型的请求优先级不一致，优先级较高的请求会先进入到请求队列中优先处理，优先级从低到高依次为：Lowest、Low、Medium、High、Highest 
    - 同种资源的优先级还会受到不同因素的影响
       + 静态资源请求的优先级会受到 preload / prefetch 的影响
+      ````html
+      <link rel="preload" href="Calibre-Regular.woff2" as="font" />
+      <link rel="prefetch" href="aws-sdk.js" as="script">
+      ````
       + script 标签会受到 defer / async 属性的影响
+      ````html
+      <script defer src="script.js"></script>
+      <script async src="script.js"></script>
+      ````
       + 图片资源根据位置的不同有不同的优先级，例如位于视口范围内优先级为 High，位于视口之外的优先级为 Low
    - Chrome 中不同资源的优先级列表
 
@@ -216,15 +218,25 @@ chrome 开发者工具 NetWork 文档：https://developer.chrome.com/docs/devtoo
 
 4. 关键请求  
    关键请求就是首屏加载必要的请求资源。
-   - 保证最初的5个请求
+   - 保证最初的5个请求都是关键请求，其中一个为 HTML 文档请求。另外四个为其他关键请求。
 
 5. 请求依赖链  
-   当浏览器在发出请求是由于另一个请求引用它时（也称为依赖项），称之为请求依赖链。
+   当浏览器在发出请求是由于另一个请求引起时（也称为依赖项），称之为请求依赖链。过长的请求依赖链对于快速加载是不友好的。
+
+#### 请求瀑布流（Timing）[Chrome Timing 名词介绍](https://developer.chrome.com/docs/devtools/network/reference/#timing-explanation)  
+1. Queued at：表示请求加入到请求队列中的 **时刻**
+2. Started at：表示请求开始处理的 **时刻**
+3. Queueing：表示清除从加入请求队列中到请求开始处理经过的时间
+4. Stalled：请求在可以被发送出去之前等待的时间（阻塞时间）
+5. Request sended：请求发送所需的时间
+6. Waiting：从发出请求到到接收到响应的第一个字节所需的时间
+7. Content Download：接收到完整的响应体（Response body）所花费的时间
 
 ### 从 NetWork 出发的优化点
 1. 减少 HTTP 请求，最快的请求就是从未发出的请求
    - 例如小图标转化为 Base64 或者使用 SVG
    - 图片懒加载
+   - vue 打包时，考虑将零碎的资源整合为一个大的资源。
 2. 压缩 CSS，JS，图片文件，减少资源的体积
 3. 关键请求要加载
    - 最初的5个请求中应该为：HTML 文档 + 4个关键请求
@@ -233,13 +245,13 @@ chrome 开发者工具 NetWork 文档：https://developer.chrome.com/docs/devtoo
 4. 避免过长的请求依赖链
 5. 控制资源加载的顺序(优先级)
    - 请求优先级会被 preload 的使用所影响。预加载的资源会被分配为高优先级，并且在页面的初始加载中优先被请求。(字体，css等，避免滥用)
-````html
-    <link rel="preload" href="Calibre-Regular.woff2" as="font" crossorigin />
-````
+   ````html
+      <link rel="preload" href="Calibre-Regular.woff2" as="font" crossorigin />
+   ````
    - 资源预读取，关键字 prefetch 作为元素 的属性 rel 的值，是为了提示浏览器用户未来的浏览有可能需要加载目标资源，所以浏览器有可能在空闲的时间内通过事先获取和缓存对应资源，优化用户体验。
-````
-<link rel="prefetch" href="https://i.snssdk.com/slardar/sdk.js" />
-````
+   ````
+   <link rel="prefetch" href="https://i.snssdk.com/slardar/sdk.js" />
+   ````
    - script 标签的引用配合 defer 和 async （[defer 和 async](https://blog.csdn.net/mrlmx/article/details/127581208)，[defer 和 async 对 script 脚本优先级的影响](https://addyosmani.com/blog/script-priorities/)）
       + defer 让 script 脚本在解析 HTML 文件时同步下载，在 HTML 文件解析完成之后，DOMContentLoaded 事件之前执行 script 脚本
       + async 让 script 脚本在解析 HTML 文件时同步下载，在 script 脚本下载完成之后马上执行脚本（不论 HTML 文件是否解析完成，若 HTML 文件未解析完成将阻塞 HTML 的解析）

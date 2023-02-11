@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance e 1</title>
+    <style>
+        #div-1 {
+            width: 100px;
+            height: 100px;
+            background-color: aqua;
+        }
+        #div-2 {
+            width: 200px;
+            height: 200px;
+            background-color: blueviolet;
+            transition: all .5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="div-1"></div>
+    <div id="div-2"></div>
+
+    <script>
+        const div1 = document.getElementById('div-1')
+        const div2 = document.getElementById('div-2')
+
+        function fn2() {
+            fn1()
+        }
+
+        function fn1() {
+            div1Click()
+        }
+
+        function div1Click() {
+            div1.style.height = '200px'
+        }
+
+        div1.addEventListener('click', fn2)
+
+        function arrForEachFn() {
+            console.log(1)
+        }
+
+        function changeColor(color) {
+            console.log(color)
+            div2.style.background = color
+        }
+        div2.addEventListener('click', function() {
+            new Array(10000).fill(0).forEach(arrForEachFn)
+            changeColor('red')
+        })
+
+    </script>
+</body>
+</html>

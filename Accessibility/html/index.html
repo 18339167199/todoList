@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility</title>
+    <style>
+        [role="checkbox"] {
+            border: 1px solid #2d2d2d;
+        }
+    </style>
+</head>
+<body>
+    <div role="checkbox" aria-checked="false" tabindex="0">
+        Receive promotional offers
+    </div>
+
+    <div role="radio" aria-labelledby="lb01" style="width: 10px; height: 10px; border: 1px solid #2d2d2d; border-radius: 100%"></div>
+    <span id="lb01">Coffee</span>
+</body>
+</html>

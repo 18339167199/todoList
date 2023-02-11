@@ -1,5 +1,9 @@
 <template>
-    <div>
+    <div id="network">
+        <a-button @click="reset">重置</a-button>
+
+        <br /><br />
+
         <a-button @click="sendRequest(10)"> 同时发送10个请求 </a-button>
 
         <br /><br />
@@ -23,7 +27,6 @@
         <!-- <a-button @click="getScript"> 发送一个获取 js 文件的请求</a-button> -->
 
         <!-- <img src="http://localhost:8081/flower-2.jpeg" alt="" width="300"> -->
-        <img :src="imgSrc" height="600" @click="resetImg">
     </div>
 </template>
 
@@ -33,7 +36,19 @@ import { getUserInfoApi, errorRequest } from '@/api/user'
 import { searchTodoApi, addTodoApi } from '@/api/todo'
 import { ref } from 'vue';
 
-const imgSrc = ref('');
+const reset = () => {
+    
+    const imgs = document.getElementsByTagName('img')
+
+    for(let i = 0; i < imgs.length; i ++) {
+        imgs[i].remove()
+    }
+
+    const link = document.getElementById('link')
+    if (link) {
+        document.getElementsByTagName('head')[0].removeChild(link)
+    }
+}
 
 const sendRequest = (num: number) => {
     for(let i = 0; i < num; i++) {
@@ -53,18 +68,18 @@ const req1 = () => {
 }
 
 const getImg = () => {
-    imgSrc.value = 'http://localhost:8081/flower.jpeg'
+    const img = document.createElement('img')
+    img.setAttribute('src', 'http://localhost:8081/flower.jpeg')
+    img.setAttribute('width', '400')
+    document.getElementById('network')!.appendChild(img)
 }
 
 const getCss = () => {
     const link = document.createElement('link')
+    link.setAttribute('id', 'link')
     link.setAttribute('rel', 'stylesheet')
     link.setAttribute('href', 'http://localhost:8081/stylesheets/style.css')
     document.getElementsByTagName('head')[0].appendChild(link)
-}
-
-const resetImg = () => {
-    imgSrc.value = ''
 }
 
 const getScript = () => {
@@ -79,3 +94,14 @@ const getScript = () => {
 // getScript()
 
 </script>
+
+<style>
+html body {
+    overflow: scroll;
+}
+
+img {
+    display: block;
+    margin: 10px auto;
+}
+</style>
